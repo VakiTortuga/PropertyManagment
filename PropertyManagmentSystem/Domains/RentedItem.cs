@@ -10,7 +10,7 @@ namespace PropertyManagmentSystem.Domains
     {
         // ОСНОВНЫЕ СВОЙСТВА
         public int RoomId { get; private set; }
-        public string Purpose { get; private set; }
+        public RoomPurpose Purpose { get; private set; }
         public DateTime RentUntil { get; private set; }
         public decimal RentAmount { get; private set; }
 
@@ -20,7 +20,7 @@ namespace PropertyManagmentSystem.Domains
         public string EarlyTerminationReason { get; private set; }
 
         // КОНСТРУКТОР
-        public RentedItem(int roomId, string purpose, DateTime rentUntil, decimal rentAmount)
+        public RentedItem(int roomId, RoomPurpose purpose, DateTime rentUntil, decimal rentAmount)
         {
             Validate(roomId, purpose, rentUntil, rentAmount);
 
@@ -31,12 +31,10 @@ namespace PropertyManagmentSystem.Domains
             IsEarlyTerminated = false;
         }
 
-        private void Validate(int roomId, string purpose, DateTime rentUntil, decimal rentAmount)
+        private void Validate(int roomId, RoomPurpose purpose, DateTime rentUntil, decimal rentAmount)
         {
             if (roomId <= 0)
                 throw new ArgumentException("ID комнаты должен быть положительным");
-            if (string.IsNullOrWhiteSpace(purpose))
-                throw new ArgumentException("Цель аренды обязательна");
             if (rentUntil <= DateTime.Now)
                 throw new ArgumentException("Срок аренды должен быть в будущем");
             if (rentAmount <= 0)

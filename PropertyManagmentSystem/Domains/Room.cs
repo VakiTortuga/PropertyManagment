@@ -12,7 +12,7 @@ namespace PropertyManagmentSystem.Domains
         public string RoomNumber { get; private set; }
         public decimal Area { get; private set; }
         public int FloorNumber { get; private set; }
-        public string FinishingType { get; private set; }
+        public FinishingType FinishingType { get; private set; }
         public bool HasPhone { get; private set; }
         public bool IsRented { get; private set; }
         public int? CurrentAgreementId { get; private set; }
@@ -22,7 +22,7 @@ namespace PropertyManagmentSystem.Domains
         public int BuildingId => _buildingId;
 
         public Room(int id, string roomNumber, decimal area, int floorNumber,
-                    string finishingType, bool hasPhone)
+                    FinishingType finishingType, bool hasPhone)
         {
             Validate(roomNumber, area, floorNumber, finishingType);
 
@@ -35,7 +35,7 @@ namespace PropertyManagmentSystem.Domains
             IsRented = false;
         }
 
-        private void Validate(string roomNumber, decimal area, int floorNumber, string finishingType)
+        private void Validate(string roomNumber, decimal area, int floorNumber, FinishingType finishingType)
         {
             if (string.IsNullOrWhiteSpace(roomNumber))
                 throw new ArgumentException("Номер комнаты обязателен");
@@ -43,8 +43,6 @@ namespace PropertyManagmentSystem.Domains
                 throw new ArgumentException("Площадь должна быть положительной");
             if (floorNumber <= 0)
                 throw new ArgumentException("Этаж должен быть положительным");
-            if (string.IsNullOrWhiteSpace(finishingType))
-                throw new ArgumentException("Тип отделки обязателен");
         }
 
         // Внутренний метод для установки Building (вызывается из Building.AddRoom)
@@ -72,11 +70,8 @@ namespace PropertyManagmentSystem.Domains
             CurrentAgreementId = null;
         }
 
-        public void UpdateFinishing(string newFinishing)
+        public void UpdateFinishing(FinishingType newFinishing)
         {
-            if (string.IsNullOrWhiteSpace(newFinishing))
-                throw new ArgumentException("Тип отделки не может быть пустым");
-
             FinishingType = newFinishing;
         }
 

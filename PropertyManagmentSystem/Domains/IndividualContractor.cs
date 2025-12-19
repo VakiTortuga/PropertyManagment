@@ -26,8 +26,8 @@ namespace PropertyManagmentSystem.Domains
         {
             if (string.IsNullOrWhiteSpace(fullName))
                 throw new ArgumentException("ФИО обязательно");
-            if (fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 2)
-                throw new ArgumentException("Укажите Фамилию и Имя");
+            if (fullName.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Length < 3)
+                throw new ArgumentException("Укажите ФИО");
             if (passport == null)
                 throw new ArgumentNullException(nameof(passport));
         }

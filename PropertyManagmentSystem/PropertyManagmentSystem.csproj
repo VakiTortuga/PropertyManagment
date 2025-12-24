@@ -63,6 +63,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Application\DTOs\BuildingDto.cs" />
+    <Compile Include="Application\DTOs\RoomDto.cs" />
+    <Compile Include="Application\Interfaces\IBuildingService.cs" />
     <Compile Include="Domains\Agreement.cs" />
     <Compile Include="Domains\Building.cs" />
     <Compile Include="Domains\BankDetails.cs" />
@@ -109,5 +112,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

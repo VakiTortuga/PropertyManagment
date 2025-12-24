@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PropertyManagmentSystem.Enums;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -94,11 +95,4 @@ namespace PropertyManagmentSystem.Domains
         public bool CanBeRented() => !IsRented;
     }
 
-    public enum FinishingType
-    {
-        Standard,       // Обычная
-        Improved,       // Улучшенная
-        Euro,           // Евроремонт
-        Luxury          // Люкс
-    }
 }

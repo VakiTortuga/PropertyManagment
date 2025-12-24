@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PropertyManagmentSystem.Enums;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -114,13 +115,4 @@ namespace PropertyManagmentSystem.Domains
         }
     }
 
-    public enum RoomPurpose
-    {
-        Office,         // Офис
-        Kiosk,          // Киоск
-        Warehouse,      // Склад
-        Retail,         // Торговое помещение
-        Cafe,           // Кафе/ресторан
-        Other           // Иное
-    }
 }

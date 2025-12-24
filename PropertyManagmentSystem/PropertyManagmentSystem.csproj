@@ -72,6 +72,11 @@
     <Compile Include="Domains\PassportData.cs" />
     <Compile Include="Domains\RentedItem.cs" />
     <Compile Include="Domains\Room.cs" />
+    <Compile Include="Enums\AgreementStatus.cs" />
+    <Compile Include="Enums\ContractorType.cs" />
+    <Compile Include="Enums\FinishingType.cs" />
+    <Compile Include="Enums\PaymentFrequency.cs" />
+    <Compile Include="Enums\RoomPurpose.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

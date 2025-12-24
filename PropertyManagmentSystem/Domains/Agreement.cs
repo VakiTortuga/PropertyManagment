@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PropertyManagmentSystem.Enums;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -222,20 +223,4 @@ namespace PropertyManagmentSystem.Domains
         }
     }
 
-    public enum AgreementStatus
-    {
-        Draft,      // Черновик
-        Active,     // Действующий
-        Completed,  // Завершён (срок истёк)
-        Cancelled   // Расторгнут досрочно
-    }
-
-    public enum PaymentFrequency
-    {
-        Monthly,        // Ежемесячно
-        Quarterly,      // Поквартально
-        SemiAnnually,   // Раз в полгода
-        Annually,       // Ежегодно
-        OneTime         // Единовременно
-    }
 }

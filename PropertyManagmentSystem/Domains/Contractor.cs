@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PropertyManagmentSystem.Enums;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -135,12 +136,5 @@ namespace PropertyManagmentSystem.Domains
                    !string.IsNullOrWhiteSpace(Phone) &&
                    Phone.Length >= 5;
         }
-    }
-
-    // Enum для типа арендатора
-    public enum ContractorType
-    {
-        Individual,     // Физическое лицо
-        LegalEntity     // Юридическое лицо
     }
 }

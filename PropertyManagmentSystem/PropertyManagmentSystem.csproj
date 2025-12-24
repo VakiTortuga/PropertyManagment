@@ -91,7 +91,10 @@
     <Compile Include="Enums\PaymentFrequency.cs" />
     <Compile Include="Enums\RoomPurpose.cs" />
     <Compile Include="Infrastructure\Interfaces\IRepository.cs" />
+    <Compile Include="Infrastructure\Repositories\AgreementRepository.cs" />
+    <Compile Include="Infrastructure\Repositories\BuildingRepository.cs" />
     <Compile Include="Infrastructure\Repositories\JsonRepositoryBase.cs" />
+    <Compile Include="Infrastructure\Repositories\RoomRepository.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

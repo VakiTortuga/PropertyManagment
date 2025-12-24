@@ -68,7 +68,9 @@
     <Compile Include="Application\DTOs\ContractorDto.cs" />
     <Compile Include="Application\DTOs\IndividualContractorDto.cs" />
     <Compile Include="Application\DTOs\LegalEntityContractorDto.cs" />
+    <Compile Include="Application\DTOs\RentedItemDto.cs" />
     <Compile Include="Application\DTOs\RoomDto.cs" />
+    <Compile Include="Application\Interfaces\IAgreementService.cs" />
     <Compile Include="Application\Interfaces\IBuildingService.cs" />
     <Compile Include="Application\Interfaces\IContractorService.cs" />
     <Compile Include="Domains\Agreement.cs" />

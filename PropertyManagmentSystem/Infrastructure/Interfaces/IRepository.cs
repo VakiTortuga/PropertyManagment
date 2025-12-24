@@ -11,13 +11,25 @@ namespace PropertyManagmentSystem.Infrastructure.Interfaces
     {
         IEnumerable<T> GetAll();
         T GetById(int id);
-
+        
         IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
-
-        int? Add(T entity);
+        
+        // Добавление с проверкой уникальности ID
+        bool Add(T entity);
+        
+        // Обновление существующей сущности
         bool Update(T entity);
+        
+        // Удаление по ID
         bool Delete(int id);
-
+        
+        // Проверка существования
         bool Exists(int id);
+        
+        // Получение следующего доступного ID
+        int GetNextAvailableId();
+        
+        // Проверка, доступен ли ID для использования
+        bool IsIdAvailable(int id);
     }
 }

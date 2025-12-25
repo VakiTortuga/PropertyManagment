@@ -90,10 +90,15 @@
     <Compile Include="Enums\FinishingType.cs" />
     <Compile Include="Enums\PaymentFrequency.cs" />
     <Compile Include="Enums\RoomPurpose.cs" />
+    <Compile Include="Infrastructure\Interfaces\IContractorRepository.cs" />
+    <Compile Include="Infrastructure\Interfaces\IIndividualContractorRepository.cs" />
+    <Compile Include="Infrastructure\Interfaces\ILegalEntityContractorRepository.cs" />
     <Compile Include="Infrastructure\Interfaces\IRepository.cs" />
     <Compile Include="Infrastructure\Repositories\AgreementRepository.cs" />
     <Compile Include="Infrastructure\Repositories\BuildingRepository.cs" />
+    <Compile Include="Infrastructure\Repositories\IndividualContractorRepository.cs" />
     <Compile Include="Infrastructure\Repositories\JsonRepositoryBase.cs" />
+    <Compile Include="Infrastructure\Repositories\LegalEntityContractorRepository.cs" />
     <Compile Include="Infrastructure\Repositories\RoomRepository.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

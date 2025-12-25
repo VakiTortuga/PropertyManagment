@@ -67,10 +67,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Application\DTOs\AgreementDto.cs" />
+    <Compile Include="Application\DTOs\BankDetailsDto.cs" />
     <Compile Include="Application\DTOs\BuildingDto.cs" />
     <Compile Include="Application\DTOs\ContractorDto.cs" />
     <Compile Include="Application\DTOs\IndividualContractorDto.cs" />
     <Compile Include="Application\DTOs\LegalEntityContractorDto.cs" />
+    <Compile Include="Application\DTOs\PassportDataDto.cs" />
     <Compile Include="Application\DTOs\RentedItemDto.cs" />
     <Compile Include="Application\DTOs\RoomDto.cs" />
     <Compile Include="Application\Interfaces\IAgreementService.cs" />

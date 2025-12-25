@@ -14,13 +14,8 @@ namespace PropertyManagmentSystem.Application.DTOs
         public int FloorsCount { get; set; }
         public string CommandantPhone { get; set; }
 
-        public List<RoomDto> Rooms { get; set; } = new List<RoomDto>();
-
         public int TotalRooms { get; set; }
         public int AvailableRooms { get; set; }
-        public int RentedRooms { get; set; }
         public decimal OccupancyRate { get; set; }
-        public decimal TotalRentedArea { get; set; }
-        public decimal TotalArea { get; set; }
     }
 }

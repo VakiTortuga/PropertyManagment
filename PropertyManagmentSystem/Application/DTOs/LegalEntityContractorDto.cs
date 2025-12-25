@@ -14,13 +14,5 @@ namespace PropertyManagmentSystem.Application.DTOs
         public string LegalAddress { get; set; }
         public string TaxId { get; set; }
         public BankDetailsDto BankDetails { get; set; }
-        public string BankName => BankDetails?.BankName;
-        public string AccountNumber => BankDetails?.AccountNumber;
-        public string BankInfo => BankDetails?.ToString();
-
-        public LegalEntityContractorDto()
-        {
-            Type = ContractorType.LegalEntity;
-        }
     }
 }

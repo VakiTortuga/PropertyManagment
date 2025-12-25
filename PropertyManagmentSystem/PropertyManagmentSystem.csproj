@@ -89,6 +89,7 @@
     <Compile Include="Application\Requests\UpdateBuildingRequest.cs" />
     <Compile Include="Application\Requests\UpdateContractorPhoneRequest.cs" />
     <Compile Include="Application\Requests\UpdateRoomRequest.cs" />
+    <Compile Include="Application\Services\AgreementService.cs" />
     <Compile Include="Application\Services\BuildingService.cs" />
     <Compile Include="Domains\Agreement.cs" />
     <Compile Include="Domains\Building.cs" />

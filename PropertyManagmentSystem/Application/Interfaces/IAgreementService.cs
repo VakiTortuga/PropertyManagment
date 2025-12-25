@@ -26,7 +26,7 @@ namespace PropertyManagmentSystem.Application.Interfaces
         AgreementDto ProlongAgreement(ProlongAgreementRequest request);
 
         // Управление арендуемыми помещениями в договоре
-        void AddRentedItemToAgreement(int agreementId, AddRentedItemRequest request);
+        void AddRentedItemToAgreement(AddRentedItemRequest request);
         void RemoveRentedItemFromAgreement(int agreementId, int roomId);
 
         // Отчетность

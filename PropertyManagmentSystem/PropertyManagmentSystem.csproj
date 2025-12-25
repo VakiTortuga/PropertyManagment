@@ -77,6 +77,7 @@
     <Compile Include="Application\DTOs\RoomDto.cs" />
     <Compile Include="Application\Interfaces\IAgreementService.cs" />
     <Compile Include="Application\Interfaces\IBuildingService.cs" />
+    <Compile Include="Application\Interfaces\IContractorIdGenerator.cs" />
     <Compile Include="Application\Interfaces\IContractorService.cs" />
     <Compile Include="Application\Requests\AddRentedItemRequest.cs" />
     <Compile Include="Application\Requests\AddRoomRequest.cs" />
@@ -91,6 +92,8 @@
     <Compile Include="Application\Requests\UpdateRoomRequest.cs" />
     <Compile Include="Application\Services\AgreementService.cs" />
     <Compile Include="Application\Services\BuildingService.cs" />
+    <Compile Include="Application\Services\ContractorIdGenerator.cs" />
+    <Compile Include="Application\Services\ContractorService.cs" />
     <Compile Include="Domains\Agreement.cs" />
     <Compile Include="Domains\Building.cs" />
     <Compile Include="Domains\BankDetails.cs" />

@@ -44,7 +44,7 @@ namespace PropertyManagmentSystem.Application.Services
         {
             var id = _agreementRepo.GetNextAvailableId();
 
-            var agreement = new Agreement(
+            var agreement = Agreement.Create(
                 id,
                 request.RegistrationNumber,
                 request.StartDate,
@@ -113,7 +113,7 @@ namespace PropertyManagmentSystem.Application.Services
         {
             var old = _agreementRepo.GetById(request.ExistingAgreementId);
 
-            var newAgreement = new Agreement(
+            var newAgreement = Agreement.Create(
                 _agreementRepo.GetNextAvailableId(),
                 $"{old.RegistrationNumber}-P",
                 request.NewStartDate,
@@ -135,7 +135,7 @@ namespace PropertyManagmentSystem.Application.Services
                 throw new InvalidOperationException("Комната недоступна");
 
             agreement.AddRentedItem(
-                new RentedItem(
+                RentedItem.Create(
                     request.RoomId,
                     request.Purpose,
                     request.RentUntil,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -24,19 +25,27 @@ namespace PropertyManagmentSystem.Domains
         public int AvailableRooms => _rooms.Count(r => !r.IsRented);
         public bool HasAvailableRooms => AvailableRooms > 0;
 
-        // КОНСТРУКТОР
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         public Building(int id, string district, string address, int floorsCount, string phone)
         {
-            Validate(district, address, floorsCount, phone);
-
-            Id = id; // ID задаётся при создании (например, из репозитория)
-            District = district;
-            Address = address;
+            // При загрузке из JSON не выполняем жесткую валидацию
+            // Только базовая проверка на null
+            Id = id;
+            District = district ?? string.Empty;
+            Address = address ?? string.Empty;
             FloorsCount = floorsCount;
-            CommandantPhone = phone;
+            CommandantPhone = phone ?? string.Empty;
         }
 
-        private void Validate(string district, string address, int floorsCount, string phone)
+        // СТАТИЧЕСКИЙ МЕТОД для создания нового здания (с полной валидацией)
+        public static Building Create(int id, string district, string address, int floorsCount, string phone)
+        {
+            Validate(district, address, floorsCount, phone);
+            return new Building(id, district, address, floorsCount, phone);
+        }
+
+        private static void Validate(string district, string address, int floorsCount, string phone)
         {
             if (string.IsNullOrWhiteSpace(district))
                 throw new ArgumentException("Район обязателен");

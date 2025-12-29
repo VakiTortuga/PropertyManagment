@@ -25,15 +25,46 @@ namespace PropertyManagmentSystem.Application.Services
         public BuildingDto GetBuildingById(int id)
         {
             var b = _buildingRepo.GetById(id);
-            return b == null ? null : MapBuilding(b);
+            if (b == null) return null;
+            
+            // Загружаем комнаты для здания
+            LoadRoomsForBuilding(b);
+            return MapBuilding(b);
         }
 
         public IEnumerable<BuildingDto> GetAllBuildings()
-            => _buildingRepo.GetAll().Select(MapBuilding);
+        {
+            var buildings = _buildingRepo.GetAll();
+            
+            // Загружаем комнаты для каждого здания
+            foreach (var building in buildings)
+            {
+                LoadRoomsForBuilding(building);
+            }
+            
+            return buildings.Select(MapBuilding);
+        }
+
+        // ВСПОМОГАТЕЛЬНЫЙ МЕТОД для загрузки комнат в здание
+        private void LoadRoomsForBuilding(Building building)
+        {
+            var rooms = _roomRepo.GetRoomsByBuildingId(building.Id).ToList();
+            foreach (var room in rooms)
+            {
+                try
+                {
+                    building.AddRoom(room);
+                }
+                catch
+                {
+                    // Комната уже добавлена или не подходит - пропускаем
+                }
+            }
+        }
 
         public void AddBuilding(CreateBuildingRequest request)
         {
-            var building = new Building(
+            var building = Building.Create(
                 _buildingRepo.GetNextAvailableId(),
                 request.District,
                 request.Address,
@@ -62,7 +93,16 @@ namespace PropertyManagmentSystem.Application.Services
 
         public void AddRoomToBuilding(int buildingId, AddRoomRequest request)
         {
-            var room = new Room(
+            // Получаем здание и ЗАГРУЖАЕМ его комнаты из репозитория
+            var building = _buildingRepo.GetById(buildingId);
+            if (building == null)
+                throw new ArgumentException($"Здание с ID {buildingId} не найдено");
+            
+            // Предварительно загружаем все комнаты этого здания
+            LoadRoomsForBuilding(building);
+
+            // Создаем новую комнату
+            var room = Room.Create(
                 _roomRepo.GetNextAvailableId(),
                 request.RoomNumber,
                 request.Area,
@@ -70,7 +110,15 @@ namespace PropertyManagmentSystem.Application.Services
                 request.FinishingType,
                 request.HasPhone);
 
+            // Добавляем комнату в здание (для валидации - проверяет уникальность номера и этажность)
+            // И устанавливаем BuildingId
+            building.AddRoom(room);
+
+            // Сохраняем комнату в репозитории (теперь с правильным BuildingId)
             _roomRepo.Add(room);
+            
+            // Обновляем здание в репозитории (для консистентности)
+            _buildingRepo.Update(building);
         }
 
         public void UpdateRoom(UpdateRoomRequest request)
@@ -81,7 +129,20 @@ namespace PropertyManagmentSystem.Application.Services
         }
 
         public void RemoveRoomFromBuilding(int roomId)
-            => _roomRepo.Delete(roomId);
+        {
+            var room = _roomRepo.GetById(roomId);
+            if (room != null)
+            {
+                var building = _buildingRepo.GetById(room.BuildingId);
+                if (building != null)
+                {
+                    building.RemoveRoom(roomId);
+                    _buildingRepo.Update(building);
+                }
+            }
+            
+            _roomRepo.Delete(roomId);
+        }
 
         public IEnumerable<RoomDto> GetAvailableRooms()
             => _roomRepo.GetAvailableRooms().Select(MapRoom);
@@ -90,10 +151,22 @@ namespace PropertyManagmentSystem.Application.Services
             => _roomRepo.GetRentedRooms().Select(MapRoom);
 
         public decimal GetBuildingOccupancyRate(int buildingId)
-            => _buildingRepo.GetById(buildingId).GetOccupancyRate();
+        {
+            var building = _buildingRepo.GetById(buildingId);
+            if (building == null) return 0;
+            
+            LoadRoomsForBuilding(building);
+            return building.GetOccupancyRate();
+        }
 
         public decimal GetTotalRentedArea(int buildingId)
-            => _buildingRepo.GetById(buildingId).GetTotalRentedArea();
+        {
+            var building = _buildingRepo.GetById(buildingId);
+            if (building == null) return 0;
+            
+            LoadRoomsForBuilding(building);
+            return building.GetTotalRentedArea();
+        }
 
         private BuildingDto MapBuilding(Building b) => new BuildingDto
         {

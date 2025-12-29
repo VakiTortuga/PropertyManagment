@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PropertyManagmentSystem.Enums;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -20,18 +21,19 @@ namespace PropertyManagmentSystem.Domains
         private List<int> _agreementIds = new List<int>();
         public IReadOnlyCollection<int> AgreementIds => _agreementIds.AsReadOnly();
 
-        // КОНСТРУКТОР
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         protected Contractor(int id, string phone, ContractorType type)
         {
-            Validate(id, phone);
-
+            // При загрузке из JSON минимальная проверка
             Id = id;
-            Phone = phone;
+            Phone = phone ?? string.Empty;
             Type = type;
             RegistrationDate = DateTime.UtcNow;
         }
 
-        private void Validate(int id, string phone)
+        // СТАТИЧЕСКИЙ МЕТОД для валидации
+        protected static void ValidateBase(int id, string phone)
         {
             if (id <= 0)
                 throw new ArgumentException("ID должен быть положительным числом");

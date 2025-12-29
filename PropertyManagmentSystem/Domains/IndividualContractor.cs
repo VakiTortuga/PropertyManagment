@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PropertyManagmentSystem.Enums;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -13,17 +14,25 @@ namespace PropertyManagmentSystem.Domains
         public string FullName { get; private set; }
         public PassportData Passport { get; private set; }
 
-        // КОНСТРУКТОР
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         public IndividualContractor(int id, string phone, string fullName, PassportData passport)
             : base(id, phone, ContractorType.Individual)
         {
-            Validate(fullName, passport);
-
-            FullName = fullName;
+            // При загрузке из JSON минимальная проверка
+            FullName = fullName ?? string.Empty;
             Passport = passport;
         }
 
-        private void Validate(string fullName, PassportData passport)
+        // СТАТИЧЕСКИЙ МЕТОД для создания с полной валидацией
+        public static IndividualContractor Create(int id, string phone, string fullName, PassportData passport)
+        {
+            ValidateBase(id, phone);
+            Validate(fullName, passport);
+            return new IndividualContractor(id, phone, fullName, passport);
+        }
+
+        private static void Validate(string fullName, PassportData passport)
         {
             if (string.IsNullOrWhiteSpace(fullName))
                 throw new ArgumentException("ФИО обязательно");

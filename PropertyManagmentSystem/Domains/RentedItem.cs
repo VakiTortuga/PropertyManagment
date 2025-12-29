@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PropertyManagmentSystem.Enums;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -20,11 +21,11 @@ namespace PropertyManagmentSystem.Domains
         public bool IsEarlyTerminated { get; private set; }
         public string EarlyTerminationReason { get; private set; }
 
-        // КОНСТРУКТОР
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         public RentedItem(int roomId, RoomPurpose purpose, DateTime rentUntil, decimal rentAmount)
         {
-            Validate(roomId, purpose, rentUntil, rentAmount);
-
+            // При загрузке из JSON минимальная проверка
             RoomId = roomId;
             Purpose = purpose;
             RentUntil = rentUntil;
@@ -32,7 +33,14 @@ namespace PropertyManagmentSystem.Domains
             IsEarlyTerminated = false;
         }
 
-        private void Validate(int roomId, RoomPurpose purpose, DateTime rentUntil, decimal rentAmount)
+        // СТАТИЧЕСКИЙ МЕТОД для создания с полной валидацией
+        public static RentedItem Create(int roomId, RoomPurpose purpose, DateTime rentUntil, decimal rentAmount)
+        {
+            Validate(roomId, purpose, rentUntil, rentAmount);
+            return new RentedItem(roomId, purpose, rentUntil, rentAmount);
+        }
+
+        private static void Validate(int roomId, RoomPurpose purpose, DateTime rentUntil, decimal rentAmount)
         {
             if (roomId <= 0)
                 throw new ArgumentException("ID комнаты должен быть положительным");

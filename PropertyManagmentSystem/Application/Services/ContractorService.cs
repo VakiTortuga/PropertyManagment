@@ -50,11 +50,11 @@ namespace PropertyManagmentSystem.Application.Services
 
         public void AddIndividualContractor(CreateIndividualContractorRequest request)
         {
-            var contractor = new IndividualContractor(
+            var contractor = IndividualContractor.Create(
                 _idGenerator.GetNextId(),
                 request.Phone,
                 request.FullName,
-                new PassportData(
+                PassportData.Create(
                     request.Passport.Series,
                     request.Passport.Number,
                     request.Passport.IssueDate,
@@ -65,14 +65,14 @@ namespace PropertyManagmentSystem.Application.Services
 
         public void AddLegalEntityContractor(CreateLegalEntityContractorRequest request)
         {
-            var contractor = new LegalEntityContractor(
+            var contractor = LegalEntityContractor.Create(
                 _legalRepo.GetNextAvailableId(),
                 request.Phone,
                 request.CompanyName,
                 request.DirectorName,
                 request.LegalAddress,
                 request.TaxId,
-                new BankDetails(
+                BankDetails.Create(
                     request.BankDetails.BankName,
                     request.BankDetails.AccountNumber
                     )

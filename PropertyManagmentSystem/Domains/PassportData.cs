@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -14,17 +15,25 @@ namespace PropertyManagmentSystem.Domains
         public DateTime IssueDate { get; }
         public string IssuedBy { get; }
 
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         public PassportData(string series, string number, DateTime issueDate, string issuedBy)
         {
-            Validate(series, number, issueDate, issuedBy);
-
-            Series = series;
-            Number = number;
+            // При загрузке из JSON минимальная проверка
+            Series = series ?? string.Empty;
+            Number = number ?? string.Empty;
             IssueDate = issueDate;
-            IssuedBy = issuedBy;
+            IssuedBy = issuedBy ?? string.Empty;
         }
 
-        private void Validate(string series, string number, DateTime issueDate, string issuedBy)
+        // СТАТИЧЕСКИЙ МЕТОД для создания с полной валидацией
+        public static PassportData Create(string series, string number, DateTime issueDate, string issuedBy)
+        {
+            Validate(series, number, issueDate, issuedBy);
+            return new PassportData(series, number, issueDate, issuedBy);
+        }
+
+        private static void Validate(string series, string number, DateTime issueDate, string issuedBy)
         {
             if (string.IsNullOrWhiteSpace(series) || series.Length != 4)
                 throw new ArgumentException("Серия паспорта должна содержать 4 цифры");

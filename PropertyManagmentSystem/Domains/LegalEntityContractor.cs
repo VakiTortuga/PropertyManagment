@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PropertyManagmentSystem.Enums;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -16,7 +17,8 @@ namespace PropertyManagmentSystem.Domains
         public string TaxId { get; private set; } // ИНН
         public BankDetails BankDetails { get; private set; }
 
-        // КОНСТРУКТОР
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         public LegalEntityContractor(
             int id,
             string phone,
@@ -27,16 +29,30 @@ namespace PropertyManagmentSystem.Domains
             BankDetails bankDetails)
             : base(id, phone, ContractorType.LegalEntity)
         {
-            Validate(companyName, directorName, legalAddress, taxId, bankDetails);
-
-            CompanyName = companyName;
-            DirectorName = directorName;
-            LegalAddress = legalAddress;
-            TaxId = taxId;
+            // При загрузке из JSON минимальная проверка
+            CompanyName = companyName ?? string.Empty;
+            DirectorName = directorName ?? string.Empty;
+            LegalAddress = legalAddress ?? string.Empty;
+            TaxId = taxId ?? string.Empty;
             BankDetails = bankDetails;
         }
 
-        private void Validate(
+        // СТАТИЧЕСКИЙ МЕТОД для создания с полной валидацией
+        public static LegalEntityContractor Create(
+            int id,
+            string phone,
+            string companyName,
+            string directorName,
+            string legalAddress,
+            string taxId,
+            BankDetails bankDetails)
+        {
+            ValidateBase(id, phone);
+            Validate(companyName, directorName, legalAddress, taxId, bankDetails);
+            return new LegalEntityContractor(id, phone, companyName, directorName, legalAddress, taxId, bankDetails);
+        }
+
+        private static void Validate(
             string companyName,
             string directorName,
             string legalAddress,

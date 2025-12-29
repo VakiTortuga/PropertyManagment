@@ -56,6 +56,8 @@ namespace PropertyManagmentSystem
 
             // Главное окно
             services.AddSingleton<MainWindow>();
+
+            // зарегистрировать генератор id, если отсутствует
             services.AddSingleton<IContractorIdGenerator, ContractorIdGenerator>();
         }
 

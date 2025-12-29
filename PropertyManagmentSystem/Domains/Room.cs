@@ -9,9 +9,9 @@ namespace PropertyManagmentSystem.Domains
 {
     public class Room
     {
-        public int Id { get; private set; }
-        public string RoomNumber { get; private set; }
-        public decimal Area { get; private set; }
+        public int Id { get; }
+        public string RoomNumber { get; }
+        public decimal Area { get; }
         public int FloorNumber { get; private set; }
         public FinishingType FinishingType { get; private set; }
         public bool HasPhone { get; private set; }

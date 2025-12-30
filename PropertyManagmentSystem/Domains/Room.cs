@@ -9,17 +9,25 @@ namespace PropertyManagmentSystem.Domains
 {
     public class Room
     {
+        // Поля
+        private int _id;
+        private string _roomNumber;
+        private decimal _area;
+        private int _floorNumber;
+        private FinishingType _finishingType;
+        private bool _hasPhone;
+        private int? _currentAgreementId;
+        private int _buildingId;
+
+        // Свойства
         public int Id { get; }
         public string RoomNumber { get; }
         public decimal Area { get; }
-        public int FloorNumber { get; private set; }
+        public int FloorNumber { get; }
         public FinishingType FinishingType { get; private set; }
         public bool HasPhone { get; private set; }
-        public bool IsRented { get; private set; }
+        public bool IsRented { get; }
         public int? CurrentAgreementId { get; private set; }
-
-        // Ссылка на Building (для навигации)
-        private int _buildingId;
         public int BuildingId => _buildingId;
 
         public Room(int id, string roomNumber, decimal area, int floorNumber,
@@ -61,13 +69,11 @@ namespace PropertyManagmentSystem.Domains
             if (IsRented)
                 throw new InvalidOperationException("Комната уже арендована");
 
-            IsRented = true;
             CurrentAgreementId = agreementId;
         }
 
         public void Release()
         {
-            IsRented = false;
             CurrentAgreementId = null;
         }
 

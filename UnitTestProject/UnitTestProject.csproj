@@ -62,7 +62,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Domains\Requirements\Room.txt" />
+    <Content Include="Requirements\problems.txt" />
+    <Content Include="Requirements\Room.txt" />
+    <Content Include="Requirements\useCase.txt" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

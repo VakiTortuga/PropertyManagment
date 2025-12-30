@@ -31,7 +31,7 @@ namespace PropertyManagmentSystem.ViewModels
             AddRoomCommand = new RelayCommand(AddRoom);
             UpdateRoomCommand = new RelayCommand(UpdateRoom);
             DeleteRoomCommand = new RelayCommand(DeleteRoom);
-            LoadStatisticsCommand = new RelayCommand(LoadStatistics);
+            LoadStatisticsCommand = new RelayCommand(LoadBuildingStatistics);
 
             LoadBuildings();
         }
@@ -56,7 +56,7 @@ namespace PropertyManagmentSystem.ViewModels
                 if (value != null)
                 {
                     LoadRooms();
-                    LoadStatistics();
+                    LoadBuildingStatistics();
                 }
             }
         }
@@ -186,6 +186,7 @@ namespace PropertyManagmentSystem.ViewModels
             if (Buildings.Count > 0)
             {
                 SelectedBuilding = Buildings[0];
+                LoadBuildingStatistics();
             }
         }
 
@@ -204,9 +205,10 @@ namespace PropertyManagmentSystem.ViewModels
             {
                 SelectedRoom = Rooms[0];
             }
+            LoadBuildingStatistics();
         }
 
-        private void LoadStatistics()
+        private void LoadBuildingStatistics()
         {
             if (SelectedBuilding == null) return;
 
@@ -218,12 +220,6 @@ namespace PropertyManagmentSystem.ViewModels
 
         private void AddBuilding()
         {
-            if (string.IsNullOrWhiteSpace(NewBuildingAddress))
-            {
-                MessageBox.Show("Адрес здания обязателен для заполнения", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
             var request = new CreateBuildingRequest
             {
                 District = NewBuildingDistrict,
@@ -259,13 +255,14 @@ namespace PropertyManagmentSystem.ViewModels
             var request = new UpdateBuildingRequest
             {
                 BuildingId = SelectedBuilding.Id,
-                District = SelectedBuilding.District,
-                CommandantPhone = SelectedBuilding.CommandantPhone
+                District = NewBuildingDistrict,
+                CommandantPhone = NewBuildingCommandantPhone
             };
 
             try
             {
                 _buildingService.UpdateBuilding(request);
+                LoadBuildings();
                 MessageBox.Show("Информация о здании успешно обновлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -337,7 +334,7 @@ namespace PropertyManagmentSystem.ViewModels
 
             try
             {
-                _buildingService.AddRoomToBuilding(SelectedBuilding.Id, request);
+                _buildingService.AddRoomToBuilding(request);
 
                 // Сброс полей
                 NewRoomNumber = "";
@@ -347,8 +344,6 @@ namespace PropertyManagmentSystem.ViewModels
                 NewRoomHasPhone = true;
 
                 LoadRooms();
-                LoadStatistics();
-
                 MessageBox.Show("Комната успешно добавлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -364,13 +359,14 @@ namespace PropertyManagmentSystem.ViewModels
             var request = new UpdateRoomRequest
             {
                 RoomId = SelectedRoom.Id,
-                FinishingType = SelectedRoom.FinishingType,
-                HasPhone = SelectedRoom.HasPhone
+                FinishingType = NewRoomFinishingType,
+                HasPhone = NewRoomHasPhone
             };
 
             try
             {
                 _buildingService.UpdateRoom(request);
+                LoadRooms();
                 MessageBox.Show("Информация о комнате успешно обновлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -395,7 +391,6 @@ namespace PropertyManagmentSystem.ViewModels
                 {
                     _buildingService.RemoveRoomFromBuilding(SelectedRoom.Id);
                     LoadRooms();
-                    LoadStatistics();
                     MessageBox.Show("Комната успешно удалена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)

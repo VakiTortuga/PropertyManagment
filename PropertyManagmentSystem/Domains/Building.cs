@@ -18,16 +18,20 @@ namespace PropertyManagmentSystem.Domains
 
         // Комнаты
         private List<Room> _rooms = new List<Room>();
+        [JsonIgnore]
         public IReadOnlyCollection<Room> Rooms => _rooms.AsReadOnly();
 
         // ВЫЧИСЛЯЕМЫЕ СВОЙСТВА
+        [JsonIgnore]
         public int TotalRooms => _rooms.Count;
+        [JsonIgnore]
         public int AvailableRooms => _rooms.Count(r => !r.IsRented);
+        [JsonIgnore]
         public bool HasAvailableRooms => AvailableRooms > 0;
 
         // КОНСТРУКТОР для JSON десериализации
         [JsonConstructor]
-        public Building(int id, string district, string address, int floorsCount, string phone)
+        public Building(int id, string district, string address, int floorsCount, string commandantPhone)
         {
             // При загрузке из JSON не выполняем жесткую валидацию
             // Только базовая проверка на null
@@ -35,7 +39,7 @@ namespace PropertyManagmentSystem.Domains
             District = district ?? string.Empty;
             Address = address ?? string.Empty;
             FloorsCount = floorsCount;
-            CommandantPhone = phone ?? string.Empty;
+            CommandantPhone = commandantPhone ?? string.Empty;
         }
 
         // СТАТИЧЕСКИЙ МЕТОД для создания нового здания (с полной валидацией)

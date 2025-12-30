@@ -91,12 +91,12 @@ namespace PropertyManagmentSystem.Application.Services
         public IEnumerable<RoomDto> GetRoomsByBuildingId(int buildingId)
             => _roomRepo.GetRoomsByBuildingId(buildingId).Select(MapRoom);
 
-        public void AddRoomToBuilding(int buildingId, AddRoomRequest request)
+        public void AddRoomToBuilding(AddRoomRequest request)
         {
             // Получаем здание и ЗАГРУЖАЕМ его комнаты из репозитория
-            var building = _buildingRepo.GetById(buildingId);
+            var building = _buildingRepo.GetById(request.BuildingId);
             if (building == null)
-                throw new ArgumentException($"Здание с ID {buildingId} не найдено");
+                throw new ArgumentException($"Здание с ID {request.BuildingId} не найдено");
             
             // Предварительно загружаем все комнаты этого здания
             LoadRoomsForBuilding(building);

@@ -20,7 +20,7 @@ namespace PropertyManagmentSystem.Application.Interfaces
         // Комнаты
         RoomDto GetRoomById(int id);
         IEnumerable<RoomDto> GetRoomsByBuildingId(int buildingId);
-        void AddRoomToBuilding(int buildingId, AddRoomRequest request);
+        void AddRoomToBuilding(AddRoomRequest request);
         void UpdateRoom(UpdateRoomRequest request);
         void RemoveRoomFromBuilding(int roomId);
 

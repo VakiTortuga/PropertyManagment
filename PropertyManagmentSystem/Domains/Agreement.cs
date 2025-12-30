@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PropertyManagmentSystem.Enums;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -29,7 +30,8 @@ namespace PropertyManagmentSystem.Domains
         public DateTime? CancellationDate { get; private set; }
         public string CancellationReason { get; private set; }
 
-        // КОНСТРУКТОР
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         public Agreement(
             int id,
             string registrationNumber,
@@ -39,19 +41,32 @@ namespace PropertyManagmentSystem.Domains
             int contractorId,
             decimal penaltyRate = 0.1m) // 10% по умолчанию
         {
-            Validate(id, registrationNumber, startDate, endDate, penaltyRate, contractorId);
-
+            // При загрузке из JSON минимальная проверка
             Id = id;
-            RegistrationNumber = registrationNumber;
+            RegistrationNumber = registrationNumber ?? string.Empty;
             StartDate = startDate;
             EndDate = endDate;
             PaymentFrequency = paymentFrequency;
             ContractorId = contractorId;
-            PenaltyRate = penaltyRate;
+            PenaltyRate = penaltyRate >= 0 && penaltyRate <= 1 ? penaltyRate : 0.1m;
             Status = AgreementStatus.Draft;
         }
 
-        private void Validate(
+        // СТАТИЧЕСКИЙ МЕТОД для создания нового договора (с полной валидацией)
+        public static Agreement Create(
+            int id,
+            string registrationNumber,
+            DateTime startDate,
+            DateTime endDate,
+            PaymentFrequency paymentFrequency,
+            int contractorId,
+            decimal penaltyRate = 0.1m)
+        {
+            Validate(id, registrationNumber, startDate, endDate, penaltyRate, contractorId);
+            return new Agreement(id, registrationNumber, startDate, endDate, paymentFrequency, contractorId, penaltyRate);
+        }
+
+        private static void Validate(
             int id,
             string registrationNumber,
             DateTime startDate,

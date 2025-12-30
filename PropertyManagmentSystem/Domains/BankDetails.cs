@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace PropertyManagmentSystem.Domains
 {
@@ -12,15 +13,23 @@ namespace PropertyManagmentSystem.Domains
         public string BankName { get; }
         public string AccountNumber { get; }
 
+        // КОНСТРУКТОР для JSON десериализации
+        [JsonConstructor]
         public BankDetails(string bankName, string accountNumber)
         {
-            Validate(bankName, accountNumber);
-
-            BankName = bankName;
-            AccountNumber = accountNumber;
+            // При загрузке из JSON минимальная проверка
+            BankName = bankName ?? string.Empty;
+            AccountNumber = accountNumber ?? string.Empty;
         }
 
-        private void Validate(string bankName, string accountNumber)
+        // СТАТИЧЕСКИЙ МЕТОД для создания с полной валидацией
+        public static BankDetails Create(string bankName, string accountNumber)
+        {
+            Validate(bankName, accountNumber);
+            return new BankDetails(bankName, accountNumber);
+        }
+
+        private static void Validate(string bankName, string accountNumber)
         {
             if (string.IsNullOrWhiteSpace(bankName))
                 throw new ArgumentException("Название банка обязательно");

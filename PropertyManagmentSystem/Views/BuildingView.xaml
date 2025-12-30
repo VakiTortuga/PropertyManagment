@@ -6,7 +6,7 @@
              xmlns:enums="clr-namespace:PropertyManagmentSystem.Enums"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
-             d:DesignHeight="500" d:DesignWidth="800">
+             d:DesignHeight="700" d:DesignWidth="1000">
 
     <UserControl.Resources>
         <ObjectDataProvider x:Key="FinishingTypes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
@@ -16,77 +16,160 @@
         </ObjectDataProvider>
     </UserControl.Resources>
 
-    <Grid Margin="8">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Список зданий и форма добавления -->
-        <StackPanel Grid.Column="0" Margin="6">
-            <TextBlock Text="Здания" FontWeight="Bold" FontSize="14" Margin="0,0,0,6"/>
-            <ListBox ItemsSource="{Binding Buildings}" SelectedItem="{Binding SelectedBuilding}" DisplayMemberPath="Address" Height="200"/>
-
-            <GroupBox Header="Добавить здание" Margin="0,8,0,0">
-                <StackPanel Margin="8">
-                    <TextBox Text="{Binding NewBuildingDistrict, UpdateSourceTrigger=PropertyChanged}" Margin="0,4" />
-                    <TextBox Text="{Binding NewBuildingAddress, UpdateSourceTrigger=PropertyChanged}" Margin="0,4" />
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Этажей:" VerticalAlignment="Center" Margin="0,6"/>
-                        <TextBox Width="60" Text="{Binding NewBuildingFloorsCount, UpdateSourceTrigger=PropertyChanged}" Margin="6,4"/>
-                        <TextBlock Text="Тел. коменданта:" VerticalAlignment="Center" Margin="12,6,0,6"/>
-                        <TextBox Text="{Binding NewBuildingCommandantPhone, UpdateSourceTrigger=PropertyChanged}" Margin="6,4" Width="140"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8">
-                        <Button Content="Добавить" Command="{Binding AddBuildingCommand}" Width="90" Margin="0,0,6,0"/>
-                        <Button Content="Обновить" Command="{Binding UpdateBuildingCommand}" Width="90" Margin="0,0,6,0"/>
-                        <Button Content="Удалить" Command="{Binding DeleteBuildingCommand}" Width="90"/>
-                    </StackPanel>
+    <DockPanel Margin="8">
+        <!-- Информация о выбранном здании -->
+        <Border DockPanel.Dock="Top" Background="#E8F4F8" BorderBrush="#4A90E2" BorderThickness="1" Padding="12" Margin="0,0,0,8" CornerRadius="3">
+            <StackPanel>
+                <TextBlock Text="Выбранное здание:" FontWeight="Bold" Margin="0,0,0,6"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Адрес: " FontWeight="SemiBold" Width="80"/>
+                    <TextBlock Text="{Binding SelectedBuilding.Address, FallbackValue='Не выбрано'}" Width="250" TextWrapping="Wrap"/>
+                    <TextBlock Text="Район: " FontWeight="SemiBold" Width="60" Margin="20,0,0,0"/>
+                    <TextBlock Text="{Binding SelectedBuilding.District}" Width="150"/>
                 </StackPanel>
-            </GroupBox>
-        </StackPanel>
-
-        <!-- Список комнат и форма -->
-        <StackPanel Grid.Column="1" Margin="6">
-            <TextBlock Text="Комнаты" FontWeight="Bold" FontSize="14" Margin="0,0,0,6"/>
-            <ListBox ItemsSource="{Binding Rooms}" SelectedItem="{Binding SelectedRoom}" DisplayMemberPath="RoomNumber" Height="180"/>
-
-            <GroupBox Header="Добавить комнату" Margin="0,8,0,0">
-                <StackPanel Margin="8">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="№:" VerticalAlignment="Center" Margin="0,6"/>
-                        <TextBox Width="80" Text="{Binding NewRoomNumber, UpdateSourceTrigger=PropertyChanged}" Margin="6,4"/>
-                        <TextBlock Text="Площадь:" VerticalAlignment="Center" Margin="12,6,0,6"/>
-                        <TextBox Width="80" Text="{Binding NewRoomArea, UpdateSourceTrigger=PropertyChanged}" Margin="6,4"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,6">
-                        <TextBlock Text="Этаж:" VerticalAlignment="Center" Margin="0,6"/>
-                        <TextBox Width="80" Text="{Binding NewRoomFloor, UpdateSourceTrigger=PropertyChanged}" Margin="6,4"/>
-                        <TextBlock Text="Отделка:" VerticalAlignment="Center" Margin="12,6,0,6"/>
-                        <ComboBox Width="140" ItemsSource="{Binding Source={StaticResource FinishingTypes}}" SelectedItem="{Binding NewRoomFinishingType}" Margin="6,4"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6">
-                        <CheckBox IsChecked="{Binding NewRoomHasPhone}" Content="Есть телефон" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8">
-                        <Button Content="Добавить" Command="{Binding AddRoomCommand}" Width="90" Margin="0,0,6,0"/>
-                        <Button Content="Обновить" Command="{Binding UpdateRoomCommand}" Width="90" Margin="0,0,6,0"/>
-                        <Button Content="Удалить" Command="{Binding DeleteRoomCommand}" Width="90"/>
-                    </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="Этажей: " FontWeight="SemiBold" Width="80"/>
+                    <TextBlock Text="{Binding SelectedBuilding.FloorsCount}" Width="50"/>
+                    <TextBlock Text="Телефон: " FontWeight="SemiBold" Width="60" Margin="20,0,0,0"/>
+                    <TextBlock Text="{Binding SelectedBuilding.CommandantPhone}" Width="150"/>
                 </StackPanel>
-            </GroupBox>
+            </StackPanel>
+        </Border>
 
-            <GroupBox Header="Статистика" Margin="0,8,0,0">
-                <StackPanel Margin="8">
-                    <TextBlock Text="{Binding TotalRooms, StringFormat=Всего комнат: {0}}" Margin="0,2"/>
-                    <TextBlock Text="{Binding AvailableRooms, StringFormat=Свободно: {0}}" Margin="0,2"/>
-                    <TextBlock Text="{Binding OccupancyRate, StringFormat=Заполняемость: {0:P0}}" Margin="0,2"/>
+        <!-- Основной контент со скроллом -->
+        <ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Левая колонка: Здания -->
+                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                    <TextBlock Text="Все здания" FontWeight="Bold" FontSize="14" Margin="0,0,0,6"/>
+                    <ListBox ItemsSource="{Binding Buildings}" SelectedItem="{Binding SelectedBuilding}" DisplayMemberPath="Address" Height="160" Margin="0,0,0,8"/>
+
+                    <GroupBox Header="Добавить новое здание" Margin="0,0,0,8">
+                        <StackPanel Margin="8">
+                            <TextBlock Text="Район:" Margin="0,0,0,2" FontSize="12"/>
+                            <TextBox Text="{Binding NewBuildingDistrict, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6" Padding="5" Height="28"/>
+                            
+                            <TextBlock Text="Адрес:" Margin="0,0,0,2" FontSize="12"/>
+                            <TextBox Text="{Binding NewBuildingAddress, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6" Padding="5" Height="28"/>
+                            
+                            <TextBlock Text="Количество этажей:" Margin="0,0,0,2" FontSize="12"/>
+                            <TextBox Text="{Binding NewBuildingFloorsCount, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6" Padding="5" Height="28"/>
+                            
+                            <TextBlock Text="Телефон коменданта:" Margin="0,0,0,2" FontSize="12"/>
+                            <TextBox Text="{Binding NewBuildingCommandantPhone, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" Padding="5" Height="28"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Button Content="Добавить" Command="{Binding AddBuildingCommand}" Width="90" Margin="0,0,6,0" Padding="8"/>
+                                <Button Content="Обновить" Command="{Binding UpdateBuildingCommand}" Width="90" Margin="0,0,6,0" Padding="8"/>
+                                <Button Content="Удалить" Command="{Binding DeleteBuildingCommand}" Width="90" Padding="8"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
                 </StackPanel>
-            </GroupBox>
-        </StackPanel>
-    </Grid>
+
+                <!-- Правая колонка: Комнаты -->
+                <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                    <TextBlock Text="Комнаты в выбранном здании" FontWeight="Bold" FontSize="14" Margin="0,0,0,6"/>
+                    <ListBox ItemsSource="{Binding Rooms}" SelectedItem="{Binding SelectedRoom}" Height="160" Margin="0,0,0,8">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding RoomNumber, StringFormat='Комната {0}'}" Padding="4"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- Информация о выбранной комнате -->
+                    <Border Background="#F0F8FF" BorderBrush="#4A90E2" BorderThickness="1" Padding="8" Margin="0,0,0,8" CornerRadius="2">
+                        <StackPanel>
+                            <TextBlock Text="Информация о выбранной комнате:" FontWeight="Bold" Margin="0,0,0,6" Foreground="#1F4788"/>
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Номер: " FontWeight="SemiBold" Width="100"/>
+                                <TextBlock Text="{Binding SelectedRoom.RoomNumber, FallbackValue='—'}"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Площадь: " FontWeight="SemiBold" Width="100"/>
+                                <TextBlock Text="{Binding SelectedRoom.Area, FallbackValue='—'}"/>
+                                <TextBlock Text=" кв.м" Margin="2,0,0,0"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Этаж: " FontWeight="SemiBold" Width="100"/>
+                                <TextBlock Text="{Binding SelectedRoom.FloorNumber, FallbackValue='—'}"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Отделка: " FontWeight="SemiBold" Width="100"/>
+                                <TextBlock Text="{Binding SelectedRoom.FinishingType, FallbackValue='—'}"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Телефон: " FontWeight="SemiBold" Width="100"/>
+                                <TextBlock Text="{Binding SelectedRoom.HasPhone, FallbackValue='—'}"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Статус: " FontWeight="SemiBold" Width="100"/>
+                                <TextBlock Text="{Binding SelectedRoom.IsRented, FallbackValue='—'}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <GroupBox Header="Добавить комнату в здание" Margin="0,0,0,8">
+                        <StackPanel Margin="8">
+                            <Border Background="#FFF8DC" BorderBrush="#FFD700" BorderThickness="1" Padding="8" Margin="0,0,0,8" CornerRadius="2">
+                                <StackPanel>
+                                    <TextBlock Text="Добавление в здание:" FontWeight="Bold" FontSize="11"/>
+                                    <TextBlock Text="{Binding SelectedBuilding.Address, FallbackValue='Выберите здание слева'}" Foreground="#8B6914" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <TextBlock Text="Номер комнаты:" Margin="0,0,0,2" FontSize="12"/>
+                            <TextBox Text="{Binding NewRoomNumber, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6" Padding="5" Height="28"/>
+                            
+                            <TextBlock Text="Площадь (кв.м):" Margin="0,0,0,2" FontSize="12"/>
+                            <TextBox Text="{Binding NewRoomArea, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6" Padding="5" Height="28"/>
+                            
+                            <TextBlock Text="Номер этажа:" Margin="0,0,0,2" FontSize="12"/>
+                            <TextBox Text="{Binding NewRoomFloor, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6" Padding="5" Height="28"/>
+                            
+                            <TextBlock Text="Тип отделки:" Margin="0,0,0,2" FontSize="12"/>
+                            <ComboBox ItemsSource="{Binding Source={StaticResource FinishingTypes}}" SelectedItem="{Binding NewRoomFinishingType}" Margin="0,0,0,6" Padding="5" Height="28"/>
+
+                            <CheckBox IsChecked="{Binding NewRoomHasPhone}" Content="Есть телефон" Margin="0,0,0,8"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Button Content="Добавить" Command="{Binding AddRoomCommand}" Width="90" Margin="0,0,6,0" Padding="8"/>
+                                <Button Content="Обновить" Command="{Binding UpdateRoomCommand}" Width="90" Margin="0,0,6,0" Padding="8"/>
+                                <Button Content="Удалить" Command="{Binding DeleteRoomCommand}" Width="90" Padding="8"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="Статистика здания" Margin="0,0,0,0">
+                        <StackPanel Margin="8">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="Всего комнат: " Width="120" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding TotalRooms}" Foreground="#1F4788"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="Свободных комнат: " Width="120" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding AvailableRooms}" Foreground="#008000"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Заполняемость: " Width="120" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding OccupancyRate}" Foreground="#FF6B00"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>

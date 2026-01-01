@@ -31,6 +31,45 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Margin="6">
+                <!-- Selected agreement details -->
+                <GroupBox Header="Детали договора" Margin="0,0,0,8">
+                    <StackPanel Margin="8">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Рег. номер: " FontWeight="Bold" Width="110"/>
+                            <TextBlock Text="{Binding SelectedAgreement.RegistrationNumber}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Арендатор: " FontWeight="Bold" Width="110"/>
+                            <TextBlock Text="{Binding SelectedAgreementContractorName}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Период: " FontWeight="Bold" Width="110"/>
+                            <TextBlock Text="{Binding SelectedAgreement.StartDate, StringFormat={}{0:dd.MM.yyyy}}"/>
+                            <TextBlock Text=" — " Margin="6,0"/>
+                            <TextBlock Text="{Binding SelectedAgreement.EndDate, StringFormat={}{0:dd.MM.yyyy}}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Статус: " FontWeight="Bold" Width="110"/>
+                            <TextBlock Text="{Binding SelectedAgreement.Status}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Месячная аренда: " FontWeight="Bold" Width="110"/>
+                            <TextBlock Text="{Binding SelectedAgreement.TotalMonthlyRent, StringFormat={}{0:C}}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Помещения в договоре:" FontWeight="Bold" Margin="0,8,0,4"/>
+                        <DataGrid ItemsSource="{Binding SelectedAgreementRooms}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="140">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Код" Binding="{Binding RoomId}" Width="60"/>
+                                <DataGridTextColumn Header="Номер" Binding="{Binding RoomNumber}" Width="100"/>
+                                <DataGridTextColumn Header="Цель" Binding="{Binding Purpose}" Width="120"/>
+                                <DataGridTextColumn Header="Сумма" Binding="{Binding RentAmount, StringFormat={}{0:C}}" Width="120"/>
+                                <DataGridTextColumn Header="По" Binding="{Binding RentUntil, StringFormat={}{0:dd.MM.yyyy}}" Width="120"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </GroupBox>
+
                 <GroupBox Header="Создать договор" Margin="0,0,0,8">
                     <StackPanel Margin="8">
                         <TextBox Text="{Binding RegistrationNumber}" Margin="0,4">

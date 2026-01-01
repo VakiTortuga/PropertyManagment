@@ -34,36 +34,70 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Меню навигации -->
+        <!-- Меню навигации + контрол времени -->
         <Border Grid.Row="0" Background="#2E3A59" Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Здания" 
-                        Command="{Binding ShowBuildingsCommand}"
-                        Foreground="White"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="15,10"
-                        FontSize="14"
-                        Margin="5,0"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <Button Content="Арендаторы" 
-                        Command="{Binding ShowContractorsCommand}"
-                        Foreground="White"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="15,10"
-                        FontSize="14"
-                        Margin="5,0"/>
+                <!-- Навигация слева -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="Здания" 
+                            Command="{Binding ShowBuildingsCommand}"
+                            Foreground="White"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="15,10"
+                            FontSize="14"
+                            Margin="5,0"/>
 
-                <Button Content="Договоры" 
-                        Command="{Binding ShowAgreementsCommand}"
-                        Foreground="White"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="15,10"
-                        FontSize="14"
-                        Margin="5,0"/>
-            </StackPanel>
+                    <Button Content="Арендаторы" 
+                            Command="{Binding ShowContractorsCommand}"
+                            Foreground="White"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="15,10"
+                            FontSize="14"
+                            Margin="5,0"/>
+
+                    <Button Content="Договоры" 
+                            Command="{Binding ShowAgreementsCommand}"
+                            Foreground="White"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="15,10"
+                            FontSize="14"
+                            Margin="5,0"/>
+                </StackPanel>
+
+                <!-- Контрол времени справа -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock x:Name="CurrentTimeText"
+                               Foreground="White"
+                               FontSize="13"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0"/>
+                    <Button Content="+1 день" Click="AdvanceDay_Click"
+                            Foreground="White"
+                            Background="Transparent"
+                            BorderThickness="1"
+                            Padding="8,6"
+                            Margin="0,0,5,0"/>
+                    <Button Content="+1 месяц" Click="AdvanceMonth_Click"
+                            Foreground="White"
+                            Background="Transparent"
+                            BorderThickness="1"
+                            Padding="8,6"
+                            Margin="0,0,5,0"/>
+                    <Button Content="Установить сейчас" Click="ResetToNow_Click"
+                            Foreground="White"
+                            Background="Transparent"
+                            BorderThickness="1"
+                            Padding="8,6"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <!-- Контентная область -->

@@ -39,7 +39,12 @@ namespace PropertyManagmentSystem.Domains
             DateTime endDate,
             PaymentFrequency paymentFrequency,
             int contractorId,
-            decimal penaltyRate = 0.1m) // 10% по умолчанию
+            decimal penaltyRate = 0.1m,
+            AgreementStatus status = AgreementStatus.Draft,
+            DateTime? signedDate = null,
+            DateTime? cancellationDate = null,
+            string cancellationReason = null,
+            IEnumerable<RentedItem> rentedItems = null)
         {
             // При загрузке из JSON минимальная проверка
             Id = id;
@@ -49,7 +54,14 @@ namespace PropertyManagmentSystem.Domains
             PaymentFrequency = paymentFrequency;
             ContractorId = contractorId;
             PenaltyRate = penaltyRate >= 0 && penaltyRate <= 1 ? penaltyRate : 0.1m;
-            Status = AgreementStatus.Draft;
+
+            // При десериализации используем переданные значения (если есть)
+            Status = status;
+            SignedDate = signedDate;
+            CancellationDate = cancellationDate;
+            CancellationReason = cancellationReason;
+
+            _rentedItems = rentedItems?.ToList() ?? new List<RentedItem>();
         }
 
         // СТАТИЧЕСКИЙ МЕТОД для создания нового договора (с полной валидацией)
@@ -124,7 +136,14 @@ namespace PropertyManagmentSystem.Domains
 
         // МЕТОДЫ ДЛЯ РАБОТЫ С ДОГОВОРОМ
 
+        // backward-compatible Sign — вызывает SignAt с DateTime.Now
         public void Sign()
+        {
+            SignAt(DateTime.Now);
+        }
+
+        // Подписать договор в момент now (используйте при виртуальном времени)
+        public void SignAt(DateTime now)
         {
             if (Status != AgreementStatus.Draft)
                 throw new InvalidOperationException("Можно подписать только черновик договора");
@@ -133,10 +152,17 @@ namespace PropertyManagmentSystem.Domains
                 throw new InvalidOperationException("Договор должен содержать хотя бы одно помещение");
 
             Status = AgreementStatus.Active;
-            SignedDate = DateTime.Now;
+            SignedDate = now;
         }
 
+        // backward-compatible Cancel
         public void Cancel(string reason)
+        {
+            CancelAt(reason, DateTime.Now);
+        }
+
+        // Отмена договора в момент now (используйте при виртуальном времени)
+        public void CancelAt(string reason, DateTime now)
         {
             if (Status != AgreementStatus.Active)
                 throw new InvalidOperationException("Можно отменить только активный договор");
@@ -145,22 +171,29 @@ namespace PropertyManagmentSystem.Domains
                 throw new ArgumentException("Причина отмены обязательна");
 
             Status = AgreementStatus.Cancelled;
-            CancellationDate = DateTime.Now;
+            CancellationDate = now;
             CancellationReason = reason;
 
-            // При отмене досрочно прекращаем все аренды
-            foreach (var item in _rentedItems.Where(ri => ri.IsActive(DateTime.Now)))
+            // При отмене досрочно прекращаем все аренды, используя переданное время
+            foreach (var item in _rentedItems.Where(ri => ri.IsActive(now)))
             {
-                item.TerminateEarly($"Досрочное расторжение договора: {reason}", DateTime.Now);
+                item.TerminateEarly($"Досрочное расторжение договора: {reason}", now);
             }
         }
 
+        // backward-compatible Complete
         public void Complete()
+        {
+            CompleteAt(DateTime.Now);
+        }
+
+        // Завершить договор в момент now (используйте при виртуальном времени)
+        public void CompleteAt(DateTime now)
         {
             if (Status != AgreementStatus.Active)
                 throw new InvalidOperationException("Можно завершить только активный договор");
 
-            if (DateTime.Now < EndDate)
+            if (now < EndDate)
                 throw new InvalidOperationException("Нельзя завершить договор до истечения срока");
 
             Status = AgreementStatus.Completed;

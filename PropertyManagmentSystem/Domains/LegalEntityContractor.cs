@@ -26,8 +26,9 @@ namespace PropertyManagmentSystem.Domains
             string directorName,
             string legalAddress,
             string taxId,
-            BankDetails bankDetails)
-            : base(id, phone, ContractorType.LegalEntity)
+            BankDetails bankDetails,
+            IEnumerable<int> agreementIds = null)
+            : base(id, phone, ContractorType.LegalEntity, agreementIds)
         {
             // При загрузке из JSON минимальная проверка
             CompanyName = companyName ?? string.Empty;
@@ -48,27 +49,18 @@ namespace PropertyManagmentSystem.Domains
             BankDetails bankDetails)
         {
             ValidateBase(id, phone);
-            Validate(companyName, directorName, legalAddress, taxId, bankDetails);
+            Validate(companyName, taxId);
             return new LegalEntityContractor(id, phone, companyName, directorName, legalAddress, taxId, bankDetails);
         }
 
         private static void Validate(
             string companyName,
-            string directorName,
-            string legalAddress,
-            string taxId,
-            BankDetails bankDetails)
+            string taxId)
         {
             if (string.IsNullOrWhiteSpace(companyName))
                 throw new ArgumentException("Название компании обязательно");
-            if (string.IsNullOrWhiteSpace(directorName))
-                throw new ArgumentException("ФИО руководителя обязательно");
-            if (string.IsNullOrWhiteSpace(legalAddress))
-                throw new ArgumentException("Юридический адрес обязателен");
-            if (string.IsNullOrWhiteSpace(taxId) || taxId.Length != 10 && taxId.Length != 12)
-                throw new ArgumentException("ИНН должен содержать 10 или 12 цифр");
-            if (bankDetails == null)
-                throw new ArgumentNullException(nameof(bankDetails));
+            if (string.IsNullOrWhiteSpace(taxId))
+                throw new ArgumentException("ИНН обязателен");
         }
 
         // БИЗНЕС-МЕТОДЫ

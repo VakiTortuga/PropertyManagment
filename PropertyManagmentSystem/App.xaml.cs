@@ -37,6 +37,9 @@ namespace PropertyManagmentSystem
             services.AddSingleton<ILegalEntityContractorRepository, LegalEntityContractorRepository>();
             services.AddSingleton<AgreementRepository>();
 
+            // Регистрация часов (AdjustableClock singleton)
+            services.AddSingleton<IClock>(sp => AdjustableClock.Instance);
+
             // Регистрация сервисов
             services.AddSingleton<IBuildingService, BuildingService>();
             services.AddSingleton<IContractorService, ContractorService>();
@@ -67,6 +70,18 @@ namespace PropertyManagmentSystem
 
             // Устанавливаем DataContext через DI
             mainWindow.DataContext = _serviceProvider.GetService<MainViewModel>();
+
+            // Привязываем AdjustableClock к AgreementService (если сервис конкретно AgreementService)
+            try
+            {
+                var clock = _serviceProvider.GetService<IClock>();
+                var agreementService = _serviceProvider.GetService<IAgreementService>() as AgreementService;
+                agreementService?.AttachClock(clock);
+            }
+            catch
+            {
+                // игнорируем, если не получилось (безопасно)
+            }
 
             mainWindow.Show();
         }

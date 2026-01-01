@@ -16,51 +16,133 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
+        <!--Колонка с арендаторами-->
         <StackPanel Grid.Column="0" Margin="6">
+            <!--Список арендаторов-->
             <TextBlock Text="Арендаторы" FontWeight="Bold" FontSize="14" Margin="0,0,0,6"/>
-            <ListBox ItemsSource="{Binding Contractors}" SelectedItem="{Binding SelectedContractor}" DisplayMemberPath="DisplayName" Height="300"/>
-            <Button Content="Добавить" Command="{Binding AddContractorCommand}" Margin="0,8,0,0" Width="120"/>
-        </StackPanel>
+            <ListBox BorderBrush="Black" BorderThickness="2"
+                     ItemsSource="{Binding Contractors}"
+                     SelectedItem="{Binding SelectedContractor}"
+                     DisplayMemberPath="DisplayName"
+                     Height="200"/>
 
-        <StackPanel Grid.Column="1" Margin="6">
-            <TextBlock Text="Тип контрагента" FontWeight="Bold" Margin="0,0,0,6"/>
-            <StackPanel Orientation="Horizontal">
-                <RadioButton Content="Физическое лицо" IsChecked="{Binding IsIndividualSelected}" Margin="0,0,6,0"/>
-                <RadioButton Content="Юридическое лицо" IsChecked="{Binding IsIndividualSelected, Converter={StaticResource BoolToVis}, ConverterParameter=invert}" />
-            </StackPanel>
-
-            <!-- Individual -->
-            <GroupBox Header="Физическое лицо" Margin="0,8,0,0" Visibility="{Binding IsIndividualSelected, Converter={StaticResource BoolToVis}}">
+            <!-- Подробная информация об арендаторе -->
+            <GroupBox Header="Информация об арендаторе" Margin="0,8,0,0">
                 <StackPanel Margin="8">
-                    <TextBox Text="{Binding IndividualPhone}" Margin="0,4"/>
-                    <TextBox Text="{Binding IndividualFullName}" Margin="0,4"/>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBox Width="80" Text="{Binding PassportSeries}" Margin="0,4"/>
-                        <TextBox Width="100" Text="{Binding PassportNumber}" Margin="6,4"/>
-                        <DatePicker SelectedDate="{Binding PassportIssueDate}" Margin="6,4"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="Тип: " FontWeight="Bold" Width="80"/>
+                        <TextBlock Text="{Binding SelectedContractor.Type}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="Телефон: " FontWeight="Bold" Width="80"/>
+                        <TextBlock Text="{Binding SelectedContractor.Phone}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="Активен: " FontWeight="Bold" Width="80"/>
+                        <TextBlock Text="{Binding SelectedContractor.IsActive}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="Дата регистрации: " FontWeight="Bold" Width="120"/>
+                        <TextBlock Text="{Binding SelectedContractor.RegistrationDate, StringFormat={}{0:dd.MM.yyyy}}"/>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
 
-            <!-- Legal -->
-            <GroupBox Header="Юридическое лицо" Margin="0,8,0,0" Visibility="{Binding IsIndividualSelected, Converter={StaticResource BoolToVis}, ConverterParameter=invert}">
-                <StackPanel Margin="8">
-                    <TextBox Text="{Binding LegalPhone}" Margin="0,4"/>
-                    <TextBox Text="{Binding CompanyName}" Margin="0,4"/>
-                    <TextBox Text="{Binding DirectorName}" Margin="0,4"/>
-                    <TextBox Text="{Binding LegalAddress}" Margin="0,4"/>
-                    <TextBox Text="{Binding TaxId}" Margin="0,4"/>
-                    <TextBox Text="{Binding BankName}" Margin="0,4"/>
-                    <TextBox Text="{Binding AccountNumber}" Margin="0,4"/>
-                </StackPanel>
+            <!--Список договоров арендатора (расширенный)-->
+            <GroupBox Header="Договоры арендатора" Margin="0,8,0,0">
+                <Grid Margin="6">
+                    <DataGrid ItemsSource="{Binding ContractorAgreements}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="True"
+                              Height="180">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="60"/>
+                            <DataGridTextColumn Header="Рег. номер" Binding="{Binding RegistrationNumber}" Width="*"/>
+                            <DataGridTextColumn Header="Начало" Binding="{Binding StartDate, StringFormat={}{0:dd.MM.yyyy}}" Width="120"/>
+                            <DataGridTextColumn Header="Окончание" Binding="{Binding EndDate, StringFormat={}{0:dd.MM.yyyy}}" Width="120"/>
+                            <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="100"/>
+                            <DataGridTextColumn Header="Месячная аренда" Binding="{Binding TotalMonthlyRent, StringFormat={}{0:C}}" Width="140"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+
+        <!--Добавление арендатора-->
+        <StackPanel Grid.Column="1" Margin="6">
+            <!--Выбор типа контрагента-->
+            <TextBlock Text="Тип контрагента" FontWeight="Bold" Margin="0,0,0,6"/>
+            <StackPanel Orientation="Horizontal">
+                <RadioButton Content="Физическое лицо"
+                             IsChecked="{Binding IsIndividualSelected}"
+                             Margin="0,0,6,0"/>
+                <RadioButton Content="Юридическое лицо"
+                             IsChecked="{Binding IsLegalEntitySelected}" />
+            </StackPanel>
+
+            <!-- Individual -->
+            <GroupBox Header="Физическое лицо" Margin="0,8,0,0"
+                      Visibility="{Binding IsIndividualSelected, Converter={StaticResource BoolToVis}}">
+                <DockPanel Margin="8">
+                    <StackPanel>
+                        <TextBlock Text="Телефон: " FontWeight="SemiBold"
+                                   Margin="0,4" Height="25" Width="80"/>
+                        <TextBlock Text="ФИО: " FontWeight="SemiBold"
+                                   Margin="0,4" Height="25" Width="80"/>
+                        <TextBlock Text="Паспорт: " FontWeight="SemiBold"
+                                   Margin="0,4" Height="25" Width="80"/>
+                        <TextBlock Text="Выдан: " FontWeight="SemiBold"
+                                   Margin="0,4" Height="25" Width="80"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBox Text="{Binding IndividualPhone}" Margin="0,4"/>
+                        <TextBox Text="{Binding IndividualFullName}" Margin="0,4"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Width="80" Text="{Binding PassportSeries}" Margin="0,4"/>
+                            <TextBox Width="100" Text="{Binding PassportNumber}" Margin="6,4"/>
+                            <DatePicker SelectedDate="{Binding PassportIssueDate}" Margin="6,4"/>
+                        </StackPanel>
+                        <TextBox Text="{Binding PassportIssuedBy}" Margin="0,4"/>
+                    </StackPanel>
+
+                </DockPanel>
             </GroupBox>
 
-            <GroupBox Header="Договоры арендатора" Margin="0,8,0,0">
-                <StackPanel>
-                    <ListBox ItemsSource="{Binding ContractorAgreements}" DisplayMemberPath="RegistrationNumber" Height="140"/>
-                    <Button Content="Обновить телефон" Command="{Binding UpdatePhoneCommand}" Width="160" Margin="0,6,0,0"/>
-                </StackPanel>
+            <!-- Legal -->
+            <GroupBox Header="Юридическое лицо" Margin="0,8,0,0"
+                      Visibility="{Binding IsLegalEntitySelected, Converter={StaticResource BoolToVis}}">
+                <DockPanel Margin="5">
+                    <StackPanel Width="100">
+                        <TextBlock Text="Телефон: " FontWeight="SemiBold"
+                            Margin="0,4" Height="25"/>
+                        <TextBlock Text="Название компании: " FontWeight="SemiBold" TextWrapping="Wrap"
+                            Margin="0,4" Height="30"/>
+                        <TextBlock Text="ФИО деректора: " FontWeight="SemiBold"
+                            Margin="0,4" Height="30"/>
+                        <TextBlock Text="Адрес: " FontWeight="SemiBold"
+                            Margin="0,4" Height="30"/>
+                        <TextBlock Text="ИНН: " FontWeight="SemiBold"
+                            Margin="0,4" Height="30"/>
+                        <TextBlock Text="Банк: " FontWeight="SemiBold"
+                            Margin="0,4" Height="25"/>
+                        <TextBlock Text="Номер счета: " FontWeight="SemiBold"
+                            Margin="0,4" Height="25"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBox Text="{Binding LegalPhone}" Margin="0,4"/>
+                        <TextBox Text="{Binding CompanyName}" Margin="0,4"/>
+                        <TextBox Text="{Binding DirectorName}" Margin="0,4"/>
+                        <TextBox Text="{Binding LegalAddress}" Margin="0,4"/>
+                        <TextBox Text="{Binding TaxId}" Margin="0,4"/>
+                        <TextBox Text="{Binding BankName}" Margin="0,4"/>
+                        <TextBox Text="{Binding AccountNumber}" Margin="0,4"/>
+                    </StackPanel>
+                </DockPanel>
+
             </GroupBox>
+
+            <Button Content="Добавить" Command="{Binding AddContractorCommand}" Margin="0,8,0,0" Width="120"/>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -89,6 +89,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Application\Interfaces\IClock.cs" />
+    <Compile Include="Application\Services\AdjustableClock.cs" />
     <Compile Include="Converters\EmptyStringToGrayConverter.cs" />
     <Compile Include="Views\AgreementView.xaml.cs">
       <DependentUpon>AgreementView.xaml</DependentUpon>

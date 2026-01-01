@@ -1,12 +1,10 @@
 ﻿using PropertyManagmentSystem.Application.DTOs;
 using PropertyManagmentSystem.Application.Interfaces;
 using PropertyManagmentSystem.Application.Requests;
-using PropertyManagmentSystem.Domains;
 using PropertyManagmentSystem.Enums;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Windows;
 using System.Windows.Input;
 
@@ -32,6 +30,8 @@ namespace PropertyManagmentSystem.ViewModels
             Contractors = new ObservableCollection<ContractorDto>();
             AvailableRooms = new ObservableCollection<RoomDto>();
 
+            SelectedAgreementRooms = new ObservableCollection<RentedItemDisplay>();
+
             LoadAgreementsCommand = new RelayCommand(LoadAgreements);
             LoadActiveAgreementsCommand = new RelayCommand(LoadActiveAgreements);
             LoadContractorsCommand = new RelayCommand(LoadContractors);
@@ -42,6 +42,56 @@ namespace PropertyManagmentSystem.ViewModels
             ProlongAgreementCommand = new RelayCommand(ProlongAgreement);
             AddRentedItemCommand = new RelayCommand(AddRentedItem);
             CalculatePenaltyCommand = new RelayCommand(CalculatePenalty);
+
+            // Подписываемся на события, чтобы автоматически обновлять списки
+            try
+            {
+                _contractorService.ContractorsChanged += LoadContractors;
+            }
+            catch { }
+
+            try
+            {
+                _buildingService.RoomsChanged += LoadAvailableRooms;
+            }
+            catch { }
+
+            // Подписываемся на события AgreementService чтобы обновлять UI при изменениях
+            try
+            {
+                _agreementService.AgreementsChanged += () =>
+                {
+                    // Обновление UI через диспетчер (безопасно из любого потока)
+                    try
+                    {
+                        System.Windows.Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+                        {
+                            LoadAgreements();
+                            LoadActiveAgreements();
+                        }));
+                    }
+                    catch
+                    {
+                    }
+                };
+            }
+            catch { }
+
+            try
+            {
+                _agreementService.RoomsChanged += () =>
+                {
+                    try
+                    {
+                        System.Windows.Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+                        {
+                            LoadAvailableRooms();
+                        }));
+                    }
+                    catch { }
+                };
+            }
+            catch { }
 
             LoadAgreements();
             LoadActiveAgreements();
@@ -62,7 +112,13 @@ namespace PropertyManagmentSystem.ViewModels
         public AgreementDto SelectedAgreement
         {
             get => _selectedAgreement;
-            set { _selectedAgreement = value; OnPropertyChanged(); }
+            set
+            {
+                _selectedAgreement = value;
+                OnPropertyChanged();
+                // When selection changes update detailed view
+                LoadSelectedAgreementDetails();
+            }
         }
 
         private ObservableCollection<AgreementDto> _activeAgreements;
@@ -164,6 +220,21 @@ namespace PropertyManagmentSystem.ViewModels
         public Array RoomPurposes =>
             Enum.GetValues(typeof(RoomPurpose));
 
+        // Collection with friendly room info for selected agreement
+        private ObservableCollection<RentedItemDisplay> _selectedAgreementRooms;
+        public ObservableCollection<RentedItemDisplay> SelectedAgreementRooms
+        {
+            get => _selectedAgreementRooms;
+            set { _selectedAgreementRooms = value; OnPropertyChanged(); }
+        }
+
+        private string _selectedAgreementContractorName;
+        public string SelectedAgreementContractorName
+        {
+            get => _selectedAgreementContractorName;
+            set { _selectedAgreementContractorName = value; OnPropertyChanged(); }
+        }
+
         // ===== Commands =====
 
         public ICommand LoadAgreementsCommand { get; }
@@ -183,6 +254,9 @@ namespace PropertyManagmentSystem.ViewModels
         {
             try
             {
+                // Сохраняем предыдущий выбор (если был)
+                var previousSelectedId = SelectedAgreement?.Id;
+
                 Agreements.Clear();
                 var agreements = _agreementService.GetAllAgreements();
                 foreach (var agreement in agreements)
@@ -190,7 +264,19 @@ namespace PropertyManagmentSystem.ViewModels
                     Agreements.Add(agreement);
                 }
 
-                if (Agreements.Count > 0)
+                // Восстанавливаем выбор: если раньше было выбрано — пытаемся найти его по Id,
+                // иначе выбираем первый только если до этого ничего не было выбрано.
+                if (previousSelectedId.HasValue)
+                {
+                    var restore = Agreements.FirstOrDefault(a => a.Id == previousSelectedId.Value);
+                    if (restore != null)
+                    {
+                        SelectedAgreement = restore;
+                        return;
+                    }
+                }
+
+                if (SelectedAgreement == null && Agreements.Count > 0)
                 {
                     SelectedAgreement = Agreements[0];
                 }
@@ -222,6 +308,8 @@ namespace PropertyManagmentSystem.ViewModels
         {
             try
             {
+                var previousSelectedId = SelectedContractorForNewAgreement?.Id;
+
                 Contractors.Clear();
                 var contractors = _contractorService.GetAllContractors();
                 foreach (var contractor in contractors)
@@ -229,7 +317,17 @@ namespace PropertyManagmentSystem.ViewModels
                     Contractors.Add(contractor);
                 }
 
-                if (Contractors.Count > 0)
+                if (previousSelectedId.HasValue)
+                {
+                    var restore = Contractors.FirstOrDefault(c => c.Id == previousSelectedId.Value);
+                    if (restore != null)
+                    {
+                        SelectedContractorForNewAgreement = restore;
+                        return;
+                    }
+                }
+
+                if (SelectedContractorForNewAgreement == null && Contractors.Count > 0)
                 {
                     SelectedContractorForNewAgreement = Contractors[0];
                 }
@@ -244,6 +342,8 @@ namespace PropertyManagmentSystem.ViewModels
         {
             try
             {
+                var previousRoomId = SelectedRoomForRent?.Id;
+
                 AvailableRooms.Clear();
                 var rooms = _buildingService.GetAvailableRooms();
                 foreach (var room in rooms)
@@ -251,7 +351,17 @@ namespace PropertyManagmentSystem.ViewModels
                     AvailableRooms.Add(room);
                 }
 
-                if (AvailableRooms.Count > 0)
+                if (previousRoomId.HasValue)
+                {
+                    var restore = AvailableRooms.FirstOrDefault(r => r.Id == previousRoomId.Value);
+                    if (restore != null)
+                    {
+                        SelectedRoomForRent = restore;
+                        return;
+                    }
+                }
+
+                if (SelectedRoomForRent == null && AvailableRooms.Count > 0)
                 {
                     SelectedRoomForRent = AvailableRooms[0];
                 }
@@ -312,6 +422,7 @@ namespace PropertyManagmentSystem.ViewModels
 
                 LoadAgreements();
                 LoadActiveAgreements();
+                LoadAvailableRooms();
             }
             catch (Exception ex)
             {
@@ -437,7 +548,7 @@ namespace PropertyManagmentSystem.ViewModels
             {
                 AgreementId = SelectedAgreement.Id,
                 RoomId = SelectedRoomForRent.Id,
-                Purpose = RoomPurpose, // Теперь это enum, а не string
+                Purpose = RoomPurpose,
                 RentUntil = RentUntil,
                 RentAmount = RentAmount
             };
@@ -452,6 +563,7 @@ namespace PropertyManagmentSystem.ViewModels
                 RentAmount = 0;
 
                 MessageBox.Show("Арендованное помещение успешно добавлено", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                // После добавления мы перезагрузим списки — методы Load* теперь попытаются восстановить выбор по Id.
                 LoadAgreements();
                 LoadAvailableRooms();
             }
@@ -478,6 +590,63 @@ namespace PropertyManagmentSystem.ViewModels
             {
                 MessageBox.Show($"Ошибка при расчете штрафа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void LoadSelectedAgreementDetails()
+        {
+            SelectedAgreementRooms.Clear();
+            SelectedAgreementContractorName = string.Empty;
+
+            if (SelectedAgreement == null) return;
+
+            // load contractor name
+            try
+            {
+                var contractor = _contractorService.GetContractorById(SelectedAgreement.ContractorId);
+                SelectedAgreementContractorName = contractor?.DisplayName ?? string.Empty;
+            }
+            catch { SelectedAgreementContractorName = string.Empty; }
+
+            if (SelectedAgreement.RentedItems == null) return;
+
+            foreach (var ri in SelectedAgreement.RentedItems)
+            {
+                try
+                {
+                    var room = _buildingService.GetRoomById(ri.RoomId);
+                    var roomNumber = room?.RoomNumber ?? ri.RoomId.ToString();
+
+                    SelectedAgreementRooms.Add(new RentedItemDisplay
+                    {
+                        RoomId = ri.RoomId,
+                        RoomNumber = roomNumber,
+                        Purpose = ri.Purpose,
+                        RentAmount = ri.RentAmount,
+                        RentUntil = ri.RentUntil
+                    });
+                }
+                catch
+                {
+                    SelectedAgreementRooms.Add(new RentedItemDisplay
+                    {
+                        RoomId = ri.RoomId,
+                        RoomNumber = ri.RoomId.ToString(),
+                        Purpose = ri.Purpose,
+                        RentAmount = ri.RentAmount,
+                        RentUntil = ri.RentUntil
+                    });
+                }
+            }
+        }
+
+        // Small helper display DTO
+        public class RentedItemDisplay
+        {
+            public int RoomId { get; set; }
+            public string RoomNumber { get; set; }
+            public RoomPurpose Purpose { get; set; }
+            public decimal RentAmount { get; set; }
+            public DateTime RentUntil { get; set; }
         }
     }
 }

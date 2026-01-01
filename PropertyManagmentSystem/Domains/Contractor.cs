@@ -23,13 +23,15 @@ namespace PropertyManagmentSystem.Domains
 
         // КОНСТРУКТОР для JSON десериализации
         [JsonConstructor]
-        protected Contractor(int id, string phone, ContractorType type)
+        protected Contractor(int id, string phone, ContractorType type, IEnumerable<int> agreementIds = null)
         {
             // При загрузке из JSON минимальная проверка
             Id = id;
             Phone = phone ?? string.Empty;
             Type = type;
             RegistrationDate = DateTime.UtcNow;
+
+            _agreementIds = agreementIds != null ? new List<int>(agreementIds) : new List<int>();
         }
 
         // СТАТИЧЕСКИЙ МЕТОД для валидации

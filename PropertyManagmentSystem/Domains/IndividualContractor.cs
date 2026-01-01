@@ -16,8 +16,8 @@ namespace PropertyManagmentSystem.Domains
 
         // КОНСТРУКТОР для JSON десериализации
         [JsonConstructor]
-        public IndividualContractor(int id, string phone, string fullName, PassportData passport)
-            : base(id, phone, ContractorType.Individual)
+        public IndividualContractor(int id, string phone, string fullName, PassportData passport, IEnumerable<int> agreementIds = null)
+            : base(id, phone, ContractorType.Individual, agreementIds)
         {
             // При загрузке из JSON минимальная проверка
             FullName = fullName ?? string.Empty;

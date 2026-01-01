@@ -25,6 +25,31 @@ namespace PropertyManagmentSystem.ViewModels
             AddContractorCommand = new RelayCommand(AddContractor);
             UpdatePhoneCommand = new RelayCommand(UpdatePhone);
 
+            // Подписываемся на событие изменений арендаторов
+            try
+            {
+                _contractorService.ContractorsChanged += () =>
+                {
+                    try
+                    {
+                        // Обновление должно происходить на UI-потоке
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            LoadContractors();
+                            if (SelectedContractor != null) LoadAgreements();
+                        });
+                    }
+                    catch
+                    {
+                        // ignore dispatcher failures
+                    }
+                };
+            }
+            catch
+            {
+                // ignore if service doesn't provide event
+            }
+
             LoadContractors();
         }
 
@@ -64,6 +89,11 @@ namespace PropertyManagmentSystem.ViewModels
         {
             get => _isIndividualSelected;
             set { _isIndividualSelected = value; OnPropertyChanged(); }
+        }
+        public bool IsLegalEntitySelected
+        {
+            get => !_isIndividualSelected;
+            set { _isIndividualSelected = !value; OnPropertyChanged(); }
         }
 
         // Для физического лица

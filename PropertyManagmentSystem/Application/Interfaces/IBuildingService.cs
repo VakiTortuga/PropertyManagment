@@ -29,5 +29,8 @@ namespace PropertyManagmentSystem.Application.Interfaces
         IEnumerable<RoomDto> GetRentedRooms();
         decimal GetBuildingOccupancyRate(int buildingId);
         decimal GetTotalRentedArea(int buildingId);
+
+        // Событие, сообщающее об изменениях в комнатах
+        event Action RoomsChanged;
     }
 }

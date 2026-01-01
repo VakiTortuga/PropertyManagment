@@ -16,7 +16,8 @@ namespace PropertyManagmentSystem.Domains
         public int FloorNumber { get; private set; }
         public FinishingType FinishingType { get; private set; }
         public bool HasPhone { get; private set; }
-        public bool IsRented { get; }
+        // IsRented is computed from CurrentAgreementId so its value is always consistent and will be serialized
+        public bool IsRented => CurrentAgreementId.HasValue;
         public int? CurrentAgreementId { get; private set; }
 
         // Ссылка на Building (для навигации) - теперь это свойство которое может быть сохранено в JSON
@@ -25,7 +26,7 @@ namespace PropertyManagmentSystem.Domains
         // КОНСТРУКТОР для JSON десериализации
         [JsonConstructor]
         public Room(int id, string roomNumber, decimal area, int floorNumber,
-                    FinishingType finishingType, bool hasPhone, int buildingId = 0)
+                    FinishingType finishingType, bool hasPhone, int buildingId = 0, int? currentAgreementId = null)
         {
             // При загрузке из JSON минимальная проверка
             Id = id;
@@ -34,8 +35,8 @@ namespace PropertyManagmentSystem.Domains
             FloorNumber = floorNumber;
             FinishingType = finishingType;
             HasPhone = hasPhone;
-            IsRented = false;
             BuildingId = buildingId;
+            CurrentAgreementId = currentAgreementId;
         }
 
         // СТАТИЧЕСКИЙ МЕТОД для создания нового помещения (с полной валидацией)
@@ -43,7 +44,7 @@ namespace PropertyManagmentSystem.Domains
                                   FinishingType finishingType, bool hasPhone)
         {
             Validate(roomNumber, area, floorNumber, finishingType);
-            return new Room(id, roomNumber, area, floorNumber, finishingType, hasPhone, 0);
+            return new Room(id, roomNumber, area, floorNumber, finishingType, hasPhone, 0, null);
         }
 
         private static void Validate(string roomNumber, decimal area, int floorNumber, FinishingType finishingType)
@@ -82,6 +83,11 @@ namespace PropertyManagmentSystem.Domains
         public void UpdateFinishing(FinishingType newFinishing)
         {
             FinishingType = newFinishing;
+        }
+
+        public void UpdatePhone(bool newHasPhone)
+        {
+            HasPhone = newHasPhone;
         }
 
         public void InstallPhone()

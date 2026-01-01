@@ -16,6 +16,8 @@ namespace PropertyManagmentSystem.Application.Services
         private readonly BuildingRepository _buildingRepo;
         private readonly RoomRepository _roomRepo;
 
+        public event Action RoomsChanged;
+
         public BuildingService(BuildingRepository buildingRepo, RoomRepository roomRepo)
         {
             _buildingRepo = buildingRepo;
@@ -119,13 +121,17 @@ namespace PropertyManagmentSystem.Application.Services
             
             // Обновляем здание в репозитории (для консистентности)
             _buildingRepo.Update(building);
+
+            RoomsChanged?.Invoke();
         }
 
         public void UpdateRoom(UpdateRoomRequest request)
         {
             var room = _roomRepo.GetById(request.RoomId);
+            room.UpdatePhone(request.HasPhone);
             room.UpdateFinishing(request.FinishingType);
             _roomRepo.Update(room);
+            RoomsChanged?.Invoke();
         }
 
         public void RemoveRoomFromBuilding(int roomId)
@@ -142,6 +148,7 @@ namespace PropertyManagmentSystem.Application.Services
             }
             
             _roomRepo.Delete(roomId);
+            RoomsChanged?.Invoke();
         }
 
         public IEnumerable<RoomDto> GetAvailableRooms()

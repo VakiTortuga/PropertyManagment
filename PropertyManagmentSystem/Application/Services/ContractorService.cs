@@ -21,6 +21,8 @@ namespace PropertyManagmentSystem.Application.Services
         private readonly AgreementRepository _agreementRepo;
         private readonly IContractorIdGenerator _idGenerator;
 
+        public event Action ContractorsChanged;
+
         public ContractorService(
             IIndividualContractorRepository individualRepo,
             ILegalEntityContractorRepository legalRepo,
@@ -42,7 +44,7 @@ namespace PropertyManagmentSystem.Application.Services
 
             return c == null ? null : MapContractor(c);
         }
-        
+
         public IEnumerable<ContractorDto> GetAllContractors()
             => _individualRepo.GetAll().Cast<Contractor>().
             Concat(_legalRepo.GetAll()).
@@ -61,12 +63,13 @@ namespace PropertyManagmentSystem.Application.Services
                     request.Passport.IssuedBy));
 
             _individualRepo.Add(contractor);
+            ContractorsChanged?.Invoke();
         }
 
         public void AddLegalEntityContractor(CreateLegalEntityContractorRequest request)
         {
             var contractor = LegalEntityContractor.Create(
-                _legalRepo.GetNextAvailableId(),
+                _idGenerator.GetNextId(),
                 request.Phone,
                 request.CompanyName,
                 request.DirectorName,
@@ -78,6 +81,7 @@ namespace PropertyManagmentSystem.Application.Services
                     )
                 );
             _legalRepo.Add(contractor);
+            ContractorsChanged?.Invoke();
         }
 
         public void UpdateContractorPhone(UpdateContractorPhoneRequest request)
@@ -85,19 +89,51 @@ namespace PropertyManagmentSystem.Application.Services
             var contractor = GetDomainContractor(request.ContractorId);
             contractor.ChangePhone(request.Phone);
             Save(contractor);
+            ContractorsChanged?.Invoke();
         }
 
+        public void NotifyContractorsChanged() => ContractorsChanged?.Invoke();
+
+        // Возвращаем полноценные DTO договоров, чтобы окно арендаторов могло их отображать
         public IEnumerable<AgreementDto> GetContractorAgreements(int contractorId)
-            => _agreementRepo.GetAgreementsByContractorId(contractorId)
-            .Select(a => new AgreementDto { Id = a.Id });
+        {
+            var agreements = _agreementRepo.GetAgreementsByContractorId(contractorId);
+            return agreements.Select(MapAgreement);
+        }
 
         public bool CanContractorCreateNewAgreement(int contractorId)
-        { 
+        {
             var contractor = GetDomainContractor(contractorId);
             return contractor.CanCreateNewAgreement(
                 _agreementRepo.GetAll()
                 .ToDictionary(a => a.Id)
                 );
+        }
+
+        private AgreementDto MapAgreement(Agreement a)
+        {
+            return new AgreementDto
+            {
+                Id = a.Id,
+                RegistrationNumber = a.RegistrationNumber,
+                StartDate = a.StartDate,
+                EndDate = a.EndDate,
+                Status = a.Status,
+                ContractorId = a.ContractorId,
+                PaymentFrequency = a.PaymentFrequency,
+                PenaltyRate = a.PenaltyRate,
+                TotalMonthlyRent = a.CalculateTotalMonthlyRent(),
+                RentedItems = a.RentedItems.Select(ri => new RentedItemDto
+                {
+                    RoomId = ri.RoomId,
+                    Purpose = ri.Purpose,
+                    RentUntil = ri.RentUntil,
+                    RentAmount = ri.RentAmount,
+                    IsEarlyTerminated = ri.IsEarlyTerminated,
+                    ActualVacationDate = ri.ActualVacationDate,
+                    EarlyTerminationReason = ri.EarlyTerminationReason
+                }).ToList()
+            };
         }
 
         private Contractor GetDomainContractor(int id)

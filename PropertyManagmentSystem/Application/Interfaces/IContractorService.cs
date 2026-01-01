@@ -23,5 +23,11 @@ namespace PropertyManagmentSystem.Application.Interfaces
         // Договора
         IEnumerable<AgreementDto> GetContractorAgreements(int contractorId);
         bool CanContractorCreateNewAgreement(int contractorId);
+
+        // Событие, оповещающее об изменениях в списке арендаторов
+        event Action ContractorsChanged;
+
+        // Позволяет другим сервисам уведомить об изменениях
+        void NotifyContractorsChanged();
     }
 }

@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:PropertyManagmentSystem.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="500" d:DesignWidth="800">
+             d:DesignHeight="802.417" d:DesignWidth="800">
 
     <UserControl.Resources>
         <conv:EmptyStringToGrayConverter x:Key="EmptyStringToGrayConverter"/>
@@ -119,7 +119,19 @@
                     <StackPanel Margin="8">
                         <StackPanel Orientation="Horizontal" Margin="0,4">
                             <TextBlock Text="Помещение:" VerticalAlignment="Center"/>
-                            <ComboBox ItemsSource="{Binding AvailableRooms}" SelectedItem="{Binding SelectedRoomForRent}" DisplayMemberPath="RoomNumber" Width="160" Margin="8,0,0,0"/>
+                            <ComboBox ItemsSource="{Binding AvailableRooms}"
+                                      SelectedItem="{Binding SelectedRoomForRent}"
+                                      Width="210" Margin="8,0,0,0">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding RoomNumber}" />
+                                            <TextBlock Text=" — " Margin="6,0,0,0"/>
+                                            <TextBlock Text="{Binding BuildingAddress}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                             <TextBlock Text="Цель:" VerticalAlignment="Center" Margin="12,0,0,0"/>
                             <ComboBox ItemsSource="{Binding RoomPurposes}" SelectedItem="{Binding RoomPurpose}" Width="140" Margin="8,0,0,0"/>
                         </StackPanel>

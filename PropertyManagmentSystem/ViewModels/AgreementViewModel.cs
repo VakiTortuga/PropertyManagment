@@ -14,7 +14,7 @@ namespace PropertyManagmentSystem.ViewModels
     {
         private readonly IAgreementService _agreementService;
         private readonly IContractorService _contractorService;
-        private readonly IBuildingService _buildingService;
+        private readonly IBuildingService _building_service;
 
         public AgreementViewModel(
             IAgreementService agreementService,
@@ -23,12 +23,12 @@ namespace PropertyManagmentSystem.ViewModels
         {
             _agreementService = agreementService;
             _contractorService = contractorService;
-            _buildingService = buildingService;
+            _building_service = buildingService;
 
             Agreements = new ObservableCollection<AgreementDto>();
             ActiveAgreements = new ObservableCollection<AgreementDto>();
             Contractors = new ObservableCollection<ContractorDto>();
-            AvailableRooms = new ObservableCollection<RoomDto>();
+            AvailableRooms = new ObservableCollection<RoomDisplay>();
 
             SelectedAgreementRooms = new ObservableCollection<RentedItemDisplay>();
 
@@ -52,7 +52,7 @@ namespace PropertyManagmentSystem.ViewModels
 
             try
             {
-                _buildingService.RoomsChanged += LoadAvailableRooms;
+                _building_service.RoomsChanged += LoadAvailableRooms;
             }
             catch { }
 
@@ -135,8 +135,9 @@ namespace PropertyManagmentSystem.ViewModels
             set { _contractors = value; OnPropertyChanged(); }
         }
 
-        private ObservableCollection<RoomDto> _availableRooms;
-        public ObservableCollection<RoomDto> AvailableRooms
+        // Теперь AvailableRooms содержит удобные объекты с адресом здания
+        private ObservableCollection<RoomDisplay> _availableRooms;
+        public ObservableCollection<RoomDisplay> AvailableRooms
         {
             get => _availableRooms;
             set { _availableRooms = value; OnPropertyChanged(); }
@@ -149,8 +150,8 @@ namespace PropertyManagmentSystem.ViewModels
             set { _selectedContractor = value; OnPropertyChanged(); }
         }
 
-        private RoomDto _selectedRoom;
-        public RoomDto SelectedRoomForRent
+        private RoomDisplay _selectedRoom;
+        public RoomDisplay SelectedRoomForRent
         {
             get => _selectedRoom;
             set { _selectedRoom = value; OnPropertyChanged(); }
@@ -345,10 +346,27 @@ namespace PropertyManagmentSystem.ViewModels
                 var previousRoomId = SelectedRoomForRent?.Id;
 
                 AvailableRooms.Clear();
-                var rooms = _buildingService.GetAvailableRooms();
+                var rooms = _building_service.GetAvailableRooms();
                 foreach (var room in rooms)
                 {
-                    AvailableRooms.Add(room);
+                    string address = string.Empty;
+                    try
+                    {
+                        var building = _building_service.GetBuildingById(room.BuildingId);
+                        if (building != null)
+                        {
+                            // Попытка взять понятное поле адреса
+                            address = building.Address ?? string.Empty;
+                        }
+                    }
+                    catch { }
+
+                    AvailableRooms.Add(new RoomDisplay
+                    {
+                        Id = room.Id,
+                        RoomNumber = room.RoomNumber,
+                        BuildingAddress = address
+                    });
                 }
 
                 if (previousRoomId.HasValue)
@@ -609,17 +627,27 @@ namespace PropertyManagmentSystem.ViewModels
 
             if (SelectedAgreement.RentedItems == null) return;
 
+            // В методе LoadSelectedAgreementDetails() при создании RentedItemDisplay
             foreach (var ri in SelectedAgreement.RentedItems)
             {
                 try
                 {
-                    var room = _buildingService.GetRoomById(ri.RoomId);
+                    var room = _building_service.GetRoomById(ri.RoomId);
                     var roomNumber = room?.RoomNumber ?? ri.RoomId.ToString();
+
+                    string buildingAddress = string.Empty;
+                    try
+                    {
+                        var building = _building_service.GetBuildingById(room.BuildingId);
+                        buildingAddress = building?.Address ?? string.Empty;
+                    }
+                    catch { /* ignore */ }
 
                     SelectedAgreementRooms.Add(new RentedItemDisplay
                     {
                         RoomId = ri.RoomId,
                         RoomNumber = roomNumber,
+                        BuildingAddress = buildingAddress,
                         Purpose = ri.Purpose,
                         RentAmount = ri.RentAmount,
                         RentUntil = ri.RentUntil
@@ -631,6 +659,7 @@ namespace PropertyManagmentSystem.ViewModels
                     {
                         RoomId = ri.RoomId,
                         RoomNumber = ri.RoomId.ToString(),
+                        BuildingAddress = string.Empty,
                         Purpose = ri.Purpose,
                         RentAmount = ri.RentAmount,
                         RentUntil = ri.RentUntil
@@ -644,9 +673,19 @@ namespace PropertyManagmentSystem.ViewModels
         {
             public int RoomId { get; set; }
             public string RoomNumber { get; set; }
+            public string BuildingAddress { get; set; }
             public RoomPurpose Purpose { get; set; }
             public decimal RentAmount { get; set; }
             public DateTime RentUntil { get; set; }
+        }
+
+        // Локальный DTO для отображения комнаты с адресом здания
+        public class RoomDisplay
+        {
+            public int Id { get; set; }
+            public string RoomNumber { get; set; }
+            public string BuildingAddress { get; set; }
+            public override string ToString() => string.IsNullOrWhiteSpace(BuildingAddress) ? RoomNumber : $"{RoomNumber} — {BuildingAddress}";
         }
     }
 }
